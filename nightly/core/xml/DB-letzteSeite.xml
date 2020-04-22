@@ -1,0 +1,127 @@
+<table:table-row table:style-name="ro6">
+<table:table-cell table:style-name="ce2" office:value-type="string" calcext:value-type="string" table:number-columns-spanned="9" table:number-rows-spanned="1">
+<text:p>
+<text:line-break/>
+Verlaufsfälle</text:p>
+</table:table-cell>
+<table:covered-table-cell table:style-name="ce6"/>
+<table:covered-table-cell table:style-name="ce8"/>
+<table:covered-table-cell table:number-columns-repeated="5" table:style-name="ce6"/>
+<table:covered-table-cell table:style-name="ce8"/>
+<table:table-cell table:number-columns-repeated="1015"/>
+</table:table-row>
+<table:table-row table:style-name="ro3">
+<table:table-cell table:style-name="ce4"/>
+<table:table-cell table:style-name="ce4" office:value-type="string" calcext:value-type="string">
+<text:p>
+<text:line-break/>
+Name</text:p>
+</table:table-cell>
+<table:table-cell table:style-name="ce10" office:value-type="string" calcext:value-type="string">
+<text:p>
+<text:line-break/>
+Nationalität</text:p>
+</table:table-cell>
+<table:table-cell table:style-name="ce4" office:value-type="string" calcext:value-type="string">
+<text:p>
+<text:line-break/>
+Alter</text:p>
+</table:table-cell>
+<table:table-cell table:style-name="ce4" office:value-type="string" calcext:value-type="string">
+<text:p>
+<text:line-break/>
+Wohnort</text:p>
+</table:table-cell>
+<table:table-cell table:style-name="ce4" office:value-type="string" calcext:value-type="string">
+<text:p>
+<text:line-break/>
+Diagnose Dritter</text:p>
+</table:table-cell>
+<table:table-cell table:style-name="ce4" office:value-type="string" calcext:value-type="string">
+<text:p>
+<text:line-break/>
+erste Einschätzung</text:p>
+</table:table-cell>
+<table:table-cell table:style-name="ce11" office:value-type="string" calcext:value-type="string">
+<text:p>
+<text:line-break/>
+Vorschlag weiteres Verfahren</text:p>
+</table:table-cell>
+<table:table-cell table:style-name="ce12" office:value-type="string" calcext:value-type="string">
+<text:p>
+<text:line-break/>
+Akten</text:p>
+</table:table-cell>
+<table:table-cell table:number-columns-repeated="1015"/>
+</table:table-row>
+<table:table-row table:style-name="ro7">
+<table:table-cell table:style-name="ce1" table:number-columns-repeated="2"/>
+<table:table-cell table:style-name="ce7"/>
+<table:table-cell table:style-name="ce1" table:number-columns-repeated="4"/>
+<table:table-cell table:style-name="ce6"/>
+<table:table-cell table:style-name="ce8"/>
+<table:table-cell table:number-columns-repeated="1015"/>
+</table:table-row>
+<table:table-row table:style-name="ro5" table:number-rows-repeated="6">
+<table:table-cell table:style-name="ce1" table:number-columns-repeated="2"/>
+<table:table-cell table:style-name="ce7"/>
+<table:table-cell table:style-name="ce1" table:number-columns-repeated="4"/>
+<table:table-cell table:style-name="ce6"/>
+<table:table-cell table:style-name="ce8"/>
+<table:table-cell table:number-columns-repeated="1015"/>
+</table:table-row>
+<table:table-row table:style-name="ro8" table:number-rows-repeated="1048485">
+<table:table-cell table:number-columns-repeated="1024"/>
+</table:table-row>
+<table:table-row table:style-name="ro9" table:number-rows-repeated="27">
+<table:table-cell table:number-columns-repeated="1024"/>
+</table:table-row>
+<table:table-row table:style-name="ro9">
+<table:table-cell table:number-columns-repeated="1024"/>
+</table:table-row>
+</table:table>
+<table:table table:name="Tabelle2" table:style-name="ta2">
+
+<table:table-column table:style-name="co9" table:number-columns-repeated="1024" table:default-cell-style-name="Default"/>
+
+<table:table-row table:style-name="ro11" table:number-rows-repeated="1048575">
+
+<table:table-cell table:number-columns-repeated="1024"/>
+
+</table:table-row>
+
+<table:table-row table:style-name="ro11">
+
+<table:table-cell table:number-columns-repeated="1024"/>
+
+</table:table-row>
+
+</table:table>
+<table:table table:name="Tabelle3" table:style-name="ta3">
+
+<table:table-column table:style-name="co9" table:number-columns-repeated="1024" table:default-cell-style-name="Default"/>
+
+<table:table-row table:style-name="ro11" table:number-rows-repeated="1048575">
+
+<table:table-cell table:number-columns-repeated="1024"/>
+
+</table:table-row>
+
+<table:table-row table:style-name="ro11">
+
+<table:table-cell table:number-columns-repeated="1024"/>
+
+</table:table-row>
+
+</table:table>
+<table:named-expressions/>
+<table:database-ranges>
+<table:database-range table:name="__Anonymous_Sheet_DB__0" table:target-range-address="Tabelle1.N40:Tabelle1.N40" table:contains-header="false">
+<table:sort>
+<table:sort-by table:field-number="0" table:data-type="automatic"/>
+</table:sort>
+</table:database-range>
+</table:database-ranges>
+</office:spreadsheet>
+</office:body>
+</office:document-content>
