@@ -1,4 +1,4 @@
 <?php
 $servername = "localhost";
-$dbname = "opsz"; 
+$dbname = "opsz_template"; 
 ?>
