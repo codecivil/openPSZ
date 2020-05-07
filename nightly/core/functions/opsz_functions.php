@@ -58,7 +58,7 @@ function trafficLight(array $PARAM,mysqli $conn)
 							<td><?php html_echo($_result['vorname']); ?></td>
 							<td><?php html_echo($value); ?></td>
 							<td>
-								<form method="post" id="ampelForm_<?php echo($_rnd); ?>" class="inline" action="" onsubmit="return callFunction(this,'getDetails','_popup_',false,'details');"><input form="ampelForm_<?php echo($_rnd); ?>" value="<?php echo($key); ?>" name="id_opsz_aufnahme" hidden="" type="text"><input form="ampelForm__<?php echo($_rnd); ?>" id="ampelSubmit__<?php echo($_rnd); ?>" hidden="" type="submit"></form>
+								<form method="post" id="ampelForm_<?php echo($_rnd); ?>" class="inline" action="" onsubmit="callFunction(this,'getDetails','_popup_',false,'details'); return false;"><input form="ampelForm_<?php echo($_rnd); ?>" value="<?php echo($key); ?>" name="id_opsz_aufnahme" hidden="" type="text"><input form="ampelForm__<?php echo($_rnd); ?>" id="ampelSubmit__<?php echo($_rnd); ?>" hidden="" type="submit"></form>
 								<label for="ampelSubmit__<?php echo($_rnd); ?>"><i class="fas fa-address-card"></i></label>
 							</td>							
 						</tr>
@@ -105,7 +105,7 @@ function trafficLight(array $PARAM,mysqli $conn)
 							<td><?php html_echo($_result['vorname']); ?></td>
 							<td><?php html_echo($value); ?></td>
 							<td>
-								<form method="post" id="ampelForm_<?php echo($_rnd); ?>" class="inline" action="" onsubmit="return callFunction(this,'getDetails','_popup_',false,'details');"><input form="ampelForm_<?php echo($_rnd); ?>" value="<?php echo($key); ?>" name="id_opsz_aufnahme" hidden="" type="text"><input form="ampelForm__<?php echo($_rnd); ?>" id="ampelSubmit__<?php echo($_rnd); ?>" hidden="" type="submit"></form>
+								<form method="post" id="ampelForm_<?php echo($_rnd); ?>" class="inline" action="" onsubmit="callFunction(this,'getDetails','_popup_',false,'details'); return false;"><input form="ampelForm_<?php echo($_rnd); ?>" value="<?php echo($key); ?>" name="id_opsz_aufnahme" hidden="" type="text"><input form="ampelForm__<?php echo($_rnd); ?>" id="ampelSubmit__<?php echo($_rnd); ?>" hidden="" type="submit"></form>
 								<label for="ampelSubmit__<?php echo($_rnd); ?>"><i class="fas fa-address-card"></i></label>
 							</td>							
 						</tr>
@@ -156,7 +156,7 @@ function trafficLight(array $PARAM,mysqli $conn)
 							<td><?php html_echo($_result['listentyp']); ?></td>
 							<td><?php html_echo($value); ?></td>
 							<td>
-								<form method="post" id="ampelForm_<?php echo($_rnd); ?>" class="inline" action="" onsubmit="return callFunction(this,'getDetails','_popup_',false,'details');"><input form="ampelForm_<?php echo($_rnd); ?>" value="<?php echo($key); ?>" name="id_opsz_aufnahme" hidden="" type="text"><input form="ampelForm__<?php echo($_rnd); ?>" id="ampelSubmit__<?php echo($_rnd); ?>" hidden="" type="submit"></form>
+								<form method="post" id="ampelForm_<?php echo($_rnd); ?>" class="inline" action="" onsubmit="callFunction(this,'getDetails','_popup_',false,'details'); return false;"><input form="ampelForm_<?php echo($_rnd); ?>" value="<?php echo($key); ?>" name="id_opsz_aufnahme" hidden="" type="text"><input form="ampelForm__<?php echo($_rnd); ?>" id="ampelSubmit__<?php echo($_rnd); ?>" hidden="" type="submit"></form>
 								<label for="ampelSubmit__<?php echo($_rnd); ?>"><i class="fas fa-address-card"></i></label>
 							</td>							
 						</tr>
@@ -209,7 +209,7 @@ function trafficLight(array $PARAM,mysqli $conn)
 							<td><?php html_echo($_result['zweck']); ?></td>
 							<td><?php html_echo($value); ?></td>
 							<td>
-								<form method="post" id="ampelForm_<?php echo($_rnd); ?>" class="inline" action="" onsubmit="return callFunction(this,'getDetails','_popup_',false,'details');"><input form="ampelForm_<?php echo($_rnd); ?>" value="<?php echo($key); ?>" name="id_opsz_aufnahme" hidden="" type="text"><input form="ampelForm__<?php echo($_rnd); ?>" id="ampelSubmit__<?php echo($_rnd); ?>" hidden="" type="submit"></form>
+								<form method="post" id="ampelForm_<?php echo($_rnd); ?>" class="inline" action="" onsubmit="callFunction(this,'getDetails','_popup_',false,'details'); return false;"><input form="ampelForm_<?php echo($_rnd); ?>" value="<?php echo($key); ?>" name="id_opsz_aufnahme" hidden="" type="text"><input form="ampelForm__<?php echo($_rnd); ?>" id="ampelSubmit__<?php echo($_rnd); ?>" hidden="" type="submit"></form>
 								<label for="ampelSubmit__<?php echo($_rnd); ?>"><i class="fas fa-address-card"></i></label>
 							</td>							
 						</tr>
@@ -255,7 +255,7 @@ function trafficLight(array $PARAM,mysqli $conn)
 							<td><?php html_echo($_result['zweck']); ?></td>
 							<td><?php html_echo($value); ?></td>
 							<td>
-								<form method="post" id="ampelForm_<?php echo($_rnd); ?>" class="inline" action="" onsubmit="return callFunction(this,'getDetails','_popup_',false,'details');"><input form="ampelForm_<?php echo($_rnd); ?>" value="<?php echo($key); ?>" name="id_opsz_aufnahme" hidden="" type="text"><input form="ampelForm__<?php echo($_rnd); ?>" id="ampelSubmit__<?php echo($_rnd); ?>" hidden="" type="submit"></form>
+								<form method="post" id="ampelForm_<?php echo($_rnd); ?>" class="inline" action="" onsubmit="callFunction(this,'getDetails','_popup_',false,'details'); return false;"><input form="ampelForm_<?php echo($_rnd); ?>" value="<?php echo($key); ?>" name="id_opsz_aufnahme" hidden="" type="text"><input form="ampelForm__<?php echo($_rnd); ?>" id="ampelSubmit__<?php echo($_rnd); ?>" hidden="" type="submit"></form>
 								<label for="ampelSubmit__<?php echo($_rnd); ?>"><i class="fas fa-address-card"></i></label>
 							</td>							
 						</tr>
@@ -316,7 +316,7 @@ function trafficLight(array $PARAM,mysqli $conn)
 							<td><?php html_echo($_table_result['vorname']); ?></td>
 							<td><?php html_echo($value); ?></td>
 							<td>
-								<form method="post" id="ampelForm_<?php echo($_rnd); ?>" class="inline" action="" onsubmit="return callFunction(this,'getDetails','_popup_',false,'details');">
+								<form method="post" id="ampelForm_<?php echo($_rnd); ?>" class="inline" action="" onsubmit="callFunction(this,'getDetails','_popup_',false,'details'); return false;">
 									<input form="ampelForm_<?php echo($_rnd); ?>" value="<?php echo($key); ?>" name="id_opsz_aufnahme" hidden="" type="text">
 									<input form="ampelForm_<?php echo($_rnd); ?>" id="ampelSubmit_<?php echo($_rnd); ?>" hidden="" type="submit"></form>
 								<label for="ampelSubmit_<?php echo($_rnd); ?>"><i class="fas fa-address-card"></i></label>
