@@ -102,7 +102,7 @@ CREATE TABLE `opsz_aufnahme` (
   `anzeichenkommentar` text DEFAULT NULL,
   `code` varchar(8) DEFAULT replace(replace(replace(ucase(left(to_base64(unhex(sha(concat(current_timestamp(),rand())))),8)),'/','1'),'+','2'),'=','3'),
   PRIMARY KEY (`id_opsz_aufnahme`)
-) ENGINE=InnoDB AUTO_INCREMENT=1030 DEFAULT CHARSET=utf8mb4 `ENCRYPTED`=YES;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 `ENCRYPTED`=YES;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -135,7 +135,7 @@ CREATE TABLE `opsz_aufnahme_permissions` (
   `role_1` int(11) DEFAULT 0,
   `restrictrole_1` text DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=77 DEFAULT CHARSET=utf8mb4 `ENCRYPTED`=YES;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 `ENCRYPTED`=YES;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -162,7 +162,7 @@ CREATE TABLE `opsz_aufnahme_references` (
   `depends_on_value` varchar(80) DEFAULT NULL,
   `allowed_values` text DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=48 DEFAULT CHARSET=utf8mb4 `ENCRYPTED`=YES;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 `ENCRYPTED`=YES;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -197,7 +197,7 @@ CREATE TABLE `opsz_db` (
   `id_opsz_vermittlungslisten` int(11) DEFAULT NULL,
   `code` varchar(8) DEFAULT replace(replace(replace(ucase(left(to_base64(unhex(sha(concat(current_timestamp(),rand())))),8)),'/','1'),'+','2'),'=','3'),
   PRIMARY KEY (`id_opsz_db`)
-) ENGINE=InnoDB AUTO_INCREMENT=397 DEFAULT CHARSET=utf8mb4 `ENCRYPTED`=YES;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 `ENCRYPTED`=YES;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -230,7 +230,7 @@ CREATE TABLE `opsz_db_permissions` (
   `role_1` int(11) DEFAULT 0,
   `restrictrole_1` text DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 `ENCRYPTED`=YES;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 `ENCRYPTED`=YES;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -329,7 +329,7 @@ CREATE TABLE `opsz_kosten_permissions` (
   `role_1` int(11) DEFAULT 0,
   `restrictrole_1` text DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8mb4 `ENCRYPTED`=YES;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 `ENCRYPTED`=YES;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -356,7 +356,7 @@ CREATE TABLE `opsz_kosten_references` (
   `depends_on_value` varchar(80) DEFAULT NULL,
   `allowed_values` text DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 `ENCRYPTED`=YES;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 `ENCRYPTED`=YES;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -395,7 +395,7 @@ CREATE TABLE `opsz_termine` (
   `beiadresse` text DEFAULT NULL,
   `code` varchar(8) DEFAULT replace(replace(replace(ucase(left(to_base64(unhex(sha(concat(current_timestamp(),rand())))),8)),'/','1'),'+','2'),'=','3'),
   PRIMARY KEY (`id_opsz_termine`)
-) ENGINE=InnoDB AUTO_INCREMENT=3001 DEFAULT CHARSET=utf8mb4 `ENCRYPTED`=YES;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 `ENCRYPTED`=YES;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -428,7 +428,7 @@ CREATE TABLE `opsz_termine_permissions` (
   `role_1` int(11) DEFAULT 0,
   `restrictrole_1` text DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8mb4 `ENCRYPTED`=YES;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 `ENCRYPTED`=YES;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -455,7 +455,7 @@ CREATE TABLE `opsz_termine_references` (
   `depends_on_value` varchar(80) DEFAULT NULL,
   `allowed_values` text DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 `ENCRYPTED`=YES;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 `ENCRYPTED`=YES;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -488,7 +488,7 @@ CREATE TABLE `opsz_vermittlungslisten` (
   `auflisteseit` date DEFAULT NULL,
   `code` varchar(8) DEFAULT replace(replace(replace(ucase(left(to_base64(unhex(sha(concat(current_timestamp(),rand())))),8)),'/','1'),'+','2'),'=','3'),
   PRIMARY KEY (`id_opsz_vermittlungslisten`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 `ENCRYPTED`=YES;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 `ENCRYPTED`=YES;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -521,7 +521,7 @@ CREATE TABLE `opsz_vermittlungslisten_permissions` (
   `role_1` int(11) DEFAULT 0,
   `restrictrole_1` text DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 `ENCRYPTED`=YES;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 `ENCRYPTED`=YES;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -548,7 +548,7 @@ CREATE TABLE `opsz_vermittlungslisten_references` (
   `depends_on_value` varchar(80) DEFAULT NULL,
   `allowed_values` text DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 `ENCRYPTED`=YES;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 `ENCRYPTED`=YES;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -567,7 +567,7 @@ UNLOCK TABLES;
 
 LOCK TABLES `os_functions` WRITE;
 /*!40000 ALTER TABLE `os_functions` DISABLE KEYS */;
-INSERT INTO `os_functions` (iconname,functionmachine,functionreadable,functionscope,functionclasses,allowed_roles,functiontarget) VALUES ('traffic-light','trafficLight','Ampel','TABLES',NULL,'[0]','important'),('comment-dots','printDB','Erzeuge DB','TABLES','details printdb','[6]','_popup_');
+INSERT INTO `os_functions` (iconname,functionmachine,functionreadable,functionscope,functionclasses,allowed_roles,functiontarget) VALUES ('traffic-light','trafficLight','Ampel','TABLES',NULL,'[0]','important'),('comment-dots','printDB','Erzeuge DB','TABLES','details printdb','[2]','_popup_');
 /*!40000 ALTER TABLE `os_functions` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -577,7 +577,7 @@ UNLOCK TABLES;
 
 LOCK TABLES `os_tables` WRITE;
 /*!40000 ALTER TABLE `os_tables` DISABLE KEYS */;
-INSERT INTO `os_tables` VALUES (2,'address-card','opsz_aufnahme','Aufnahme','[0,6]','[6]',NULL),(4,'calendar-alt','opsz_termine','Dokumentation und Termine','[0,6]','[6]',NULL),(5,'comments','opsz_db','Dienstbesprechung','[0,6]','[6]','[\"opsz_aufnahme__verantwortlich\",\"opsz_aufnahme__name\",\"opsz_aufnahme__vorname\",\"opsz_aufnahme__herkunft\",\"opsz_aufnahme__geburtsdatum\",\"opsz_aufnahme__landkreisregion\",\"opsz_dokumentation__diagnose\"]'),(6,'calendar-check','os_calendars','Kalenderserver','[0,6]',NULL,NULL),(7,'hand-holding-usd','opsz_kosten','Kostenübernahme','[6]','[6]',NULL),(8,'clipboard-list','opsz_vermittlungslisten','Vermittlungsliste','[6]','[6]',NULL);
+INSERT INTO `os_tables` VALUES (2,'address-card','opsz_aufnahme','Aufnahme','[0,2]','[2]',NULL),(4,'calendar-alt','opsz_termine','Dokumentation und Termine','[0,2]','[2]',NULL),(5,'comments','opsz_db','Dienstbesprechung','[0,2]','[2]','[\"opsz_aufnahme__verantwortlich\",\"opsz_aufnahme__name\",\"opsz_aufnahme__vorname\",\"opsz_aufnahme__herkunft\",\"opsz_aufnahme__geburtsdatum\",\"opsz_aufnahme__landkreisregion\",\"opsz_dokumentation__diagnose\"]'),(6,'calendar-check','os_calendars','Kalenderserver','[0,2]',NULL,NULL),(7,'hand-holding-usd','opsz_kosten','Kostenübernahme','[2]','[2]',NULL),(8,'clipboard-list','opsz_vermittlungslisten','Vermittlungsliste','[2]','[2]',NULL);
 /*!40000 ALTER TABLE `os_tables` ENABLE KEYS */;
 UNLOCK TABLES;
 
