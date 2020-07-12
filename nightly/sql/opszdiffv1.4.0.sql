@@ -25,7 +25,8 @@ UPDATE opsz_aufnahme SET genderaspekte = CONCAT('["PsychotherapeutIn","',`geschl
 ALTER TABLE opsz_aufnahme DROP COLUMN `geschlechttherapeutwichtig`;
 DELETE FROM opsz_aufnahme_permissions WHERE keymachine = 'geschlechttherapeutwichtig';
 
-UPDATE opsz_aufnahme SET sprachkenntnisse = CONCAT('[',`sprache`,',[',`sprachedetail`,']]');
+UPDATE opsz_aufnahme SET sprachedetail = '' WHERE sprachedetail IS NULL;
+UPDATE opsz_aufnahme SET sprachkenntnisse = CONCAT('[',`sprache`,',["',`sprachedetail`,'"]]');
 ALTER TABLE opsz_aufnahme DROP COLUMN `sprache`;
 ALTER TABLE opsz_aufnahme DROP COLUMN `sprachedetail`;
 DELETE FROM opsz_aufnahme_permissions WHERE keymachine = 'sprache';
