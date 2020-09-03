@@ -1,5 +1,221 @@
 <?php
-function trafficLight(array $PARAM,mysqli $conn)
+function substr_in_array($needle, array $haystack)
+{
+	//by Colin DeCarlo from https://akrabat.com/substr_in_array/
+    return array_reduce($haystack, function ($inArray, $item) use ($needle) {
+        return $inArray || false !== strpos($item, $needle);
+    }, false);
+}
+
+function trafficLight(array $PARAM, mysqli $conn)
+{
+	$tables = $PARAM['table'];
+	
+	unset($_stmt_array); $_stmt_array = array();
+	$_stmt_array['stmt'] = "SELECT functionconfig from os_functions where functionmachine = 'trafficLight'";
+	$_config = json_decode(execute_stmt($_stmt_array,$conn,true)['result'][0]['functionconfig'],true);
+	unset($_stmt_array); $_stmt_array = array();
+	$_stmt_array['stmt'] = 'SELECT iconname,tablemachine from os_tables';
+	/*$_stmt_array['str_types'] = 's';
+	$_stmt_array['arr_values'] = array($table);*/
+	$_table_result = execute_stmt($_stmt_array,$conn,true)['result'];
+	$icon = array();
+	for ( $i = 0; $i < sizeof($_table_result); $i++ ) {
+		$icon[$_table_result[$i]['tablemachine']] = $_table_result[$i]['iconname'];
+	}
+	
+	if (sizeof($tables) == 0) { return; }
+	?>
+	<div class="imp_wrapper">
+		<div class="imp_close"><i class="fas fa-times-circle" onclick="_close(this,true);"></i></div>
+	<?php
+	foreach ( $tables as $table ) {
+		$ids = array(); $resultin = array(); $_param = array();
+		foreach ( $_config['criteria'] as $criterion ){
+			if ($criterion['table'] == $table ) { 
+				$resultout_array = _parseCriterion($resultin,$_param,$criterion,$conn);
+				$resultout = $resultout_array[0];
+				$_param = $resultout_array[1];
+				foreach ( $resultout as $id ) {
+					$_criteriondetail = ''; if ( isset($_param['id'.$id]) ) { $_criteriondetail = ": ".$_param['id'.$id]; }
+					if ( ! array_key_exists($id,$ids) ) { $ids[$id] = array(); $ids[$id]['urgency'] = 0; $ids[$id]['criteria'] = array(); }
+					if ( $criterion['urgency'] == "+" ) { $ids[$id]['urgency'] += 1; }
+					if ( $criterion['urgency'] == "-" ) { $ids[$id]['urgency'] -= 1; }
+					if ( is_int($criterion['urgency']) ) { $ids[$id]['urgency'] = max($ids[$id]['urgency'],$criterion['urgency']); }
+					if (! substr_in_array($criterion['name'],$ids[$id]['criteria']) ) { array_push($ids[$id]['criteria'],$criterion['name'].$_criteriondetail); } 
+				}
+			}
+		}
+		$identifiers = implode(',',$_config['identifiers'][$table]);
+		$identifiers_esc = "'".str_replace(",","','",$identifiers)."'";
+		unset($_stmt_array); $_stmt_array = array();
+		$_stmt_array['stmt'] = 'SELECT keymachine,keyreadable from '.$table.'_permissions WHERE keymachine IN ('.$identifiers_esc.')';
+		$_identifiers_result = execute_stmt($_stmt_array,$conn)['result'];
+		$_identifiers_readable = array_combine($_identifiers_result['keymachine'],$_identifiers_result['keyreadable']);						
+		unset($_stmt_array); $_stmt_array = array();
+		$_stmt_array['stmt'] = 'SELECT id_'.$table.','.$identifiers.' from view__'.$table.'__'.$_SESSION['os_role'].' WHERE id_'.$table.' IN ('.implode(',',array_keys($ids)).')';						
+		$_table_result = execute_stmt($_stmt_array,$conn,true)['result'];
+		if ( ! $_table_result OR sizeof($_table_result) == 0 ) { continue; }
+		?>
+		<div class="tableicon"><i class="fas fa-<?php html_echo($icon[$table]); ?>"></i></div>
+		<div>
+			<table>
+				<tr>
+					<?php
+					foreach ( $_config['identifiers'][$table] as $identifier ) {
+					?>
+						<th><?php echo($_identifiers_readable[$identifier]); ?></th>
+					<?php
+					}
+					?>
+					<th>Kriterien</th>
+				</tr>
+		<?php
+		foreach ( $_table_result as $_item ) {
+			$_rnd = rand(0,32767);
+			if ( $ids[$_item['id_'.$table]]['urgency'] == 1 ) { $_class = "yellow"; }
+			if ( $ids[$_item['id_'.$table]]['urgency'] == 2 ) { $_class = "orange"; }
+			if ( $ids[$_item['id_'.$table]]['urgency'] > 2 ) { $_class = "red"; }
+			?>
+			<tr class="<?php html_echo($_class); ?>">
+				<?php
+				foreach ( $_config['identifiers'][$table] as $identifier ) {
+				?>
+					<td><?php html_echo($_item[$identifier]); ?></td>
+				<?php } ?>
+				<td><?php html_echo(implode(' | ',$ids[$_item['id_'.$table]]['criteria'])); ?></td>
+				<td>
+					<form method="post" id="ampelForm_<?php echo($_rnd); ?>" class="inline" action="" onsubmit="callFunction(this,'getDetails','_popup_',false,'details'); return false;"><input form="ampelForm_<?php echo($_rnd); ?>" value="<?php echo($_item['id_'.$table]); ?>" name="id_opsz_aufnahme" hidden="" type="text"><input form="ampelForm_<?php echo($_rnd); ?>" id="ampelSubmit__<?php echo($_rnd); ?>" hidden="" type="submit"></form>
+					<label for="ampelSubmit__<?php echo($_rnd); ?>"><i class="fas fa-address-card"></i></label>
+				</td>							
+			</tr>
+			<?php
+		}
+		?>
+			</table>
+			<br />
+		</div>
+		<?php 
+	}
+}
+
+function _parseCriterion(array $resultin, array $_param, array $criterion, mysqli $conn) {
+	//included 'not': use notimplies whenever possible, since otherwise we have to define an _all array, what costs a lot if time!
+	$_logical = array("and","or","not","notimplies","implies");
+	$_logical = array_values(array_intersect($_logical,array_keys($criterion)));
+	if ( isset($_logical[0]) ) { 
+		//rewrite for some keywords before parsing subcriteria:
+		switch ($_logical[0]) {
+			case 'implies':
+				//binary relation
+				//rewrite implies(a,b) to ( !a or b )
+				$criterion['or'] = array();
+				$criterion['or'][0]=array("not"=>$criterion['implies'][0]);
+				$criterion['or'][1]=$criterion['implies'][1];
+				unset($criterion['implies']);
+				$_logcial[0] = 'or';
+				break;
+		}
+		$subcriteria = $criterion[$_logical[0]] ;
+		if ( ! $subcriteria[0] ) { $subcriteria = array($subcriteria); } // this is for "not": applies only to one criterion, so is no array of criteria by design
+		foreach ($subcriteria as $index => $subcriterion ) {
+			$subcriterion['table'] = $criterion['table'];
+			$subresultout_array = _parseCriterion($resultin,$_param,$subcriterion,$conn);
+			$subresultout = $subresultout_array[0];
+			$_subparam = $subresultout_array[1];
+			$_param = array_merge($_param,$_subparam);
+			switch($_logical[0]) {
+				case 'and':
+					if ( $index == 0 ) { $resultin = $subresultout; }
+					else { $resultin = array_values(array_intersect($resultin,$subresultout)); }
+					break;
+				case 'or': 
+					$resultin = array_unique(array_merge($resultin,$subresultout));
+					break;
+				case 'not':
+					if (! isset($_all) ) {
+						unset($_stmt_array); $_stmt_array = array();
+						$_stmt_array['stmt'] = "SELECT id_".$criterion['table']." AS id FROM view__".$criterion['table']."__".$_SESSION['os_role'];
+						$_all = execute_stmt($_stmt_array,$conn)['result']['id'];
+					}
+					$resultin = array_diff($_all,$subresultout);
+					break;
+				case 'notimplies':
+					// binary relation
+					// this is special: notimplies(a,b) is equivalent to (a AND !b), so we dont need $_all but can array_diff to result of a; this is much faster!
+					if ( $index == 0 ) { $resultin = $subresultout; }
+					if ( $index == 1 ) { $resultin = array_diff($resultin,$subresultout); }
+					break;
+			}
+		}
+		return array($resultin,$_param);
+	} else {
+	//proper parsing
+	//the following only works for simple queries: fix it for multiple select, from, where and 'distinct'... keywords
+		$_where_array = preg_split('/ WHERE /i',$criterion['sql'],2);
+		$_where = $_where_array[1];
+		$_from_array = preg_split('/ FROM /i',$_where_array[0],2);
+		$_from = $_from_array[1];
+		$_select_array = preg_split('/SELECT /i',$_from_array[0],2);
+		$_select = $_select_array[1];
+		unset($_stmt_array); $_stmt_array = array();
+		$_resultout = array (); $_param = array ();
+		$_stmt_array['stmt'] = "SELECT id_".$criterion['table'].",".$_select." AS PARAM FROM view__".$_from."__".$_SESSION['os_role']." WHERE ".$_where." GROUP BY id_".$criterion['table']." ORDER BY PARAM DESC";
+		foreach ( execute_stmt($_stmt_array,$conn,true)['result'] as $_maybe ) {
+			$value = $_maybe['PARAM'];
+			if ( $key == 'id_'.$criterion['table'] ) { continue; }
+			$_push = false;
+			switch($criterion['relation']) {
+				case '>':
+					if ( $value > $criterion['benchmark'] ) { $_push = true; }
+					break;
+				case '>=':
+					if ( $value >= $criterion['benchmark'] ) { $_push = true; }
+					break;
+				case '<':
+					if ( $value < $criterion['benchmark'] ) { $_push = true; }
+					break;
+				case '<=':
+					if ( $value <= $criterion['benchmark'] ) { $_push = true; }
+					break;
+				case '=':
+					if ( $value == $criterion['benchmark'] ) { $_push = true; }
+					break;
+				case '!=':
+					if ( $value != $criterion['benchmark'] ) { $_push = true; }
+					break;
+				case 'contains':
+					if ( strpos($value,$criterion['benchmark']) ) { $_push = true; }
+					break;
+				case 'beginswith':
+					if ( strpos($value,$criterion['benchmark']) == 0 ) { $_push = true; }
+					break;
+				case 'endswith':
+					if ( strpos($value,$criterion['benchmark']) == strlen($value) - strlen($criterion['benchmark']) ) { $_push = true; }
+					break;
+				case 'notcontains':
+					if ( ! strpos($value,$criterion['benchmark']) ) { $_push = true; }
+					break;
+				case 'notbeginswith':
+					if ( strpos($value,$criterion['benchmark']) !== 0 ) { $_push = true; }
+					break;
+				case 'notendswith':
+					if ( strpos($value,$criterion['benchmark']) !== strlen($value) - strlen($criterion['benchmark']) ) { $_push = true; }
+					break;
+			}
+			if ( $_push ) { 
+				array_push($_resultout,$_maybe['id_'.$criterion['table']]);
+				if ( isset($criterion['display']) ) {
+					//need non-numeric keys for array_merge to do what we want
+					$_param['id'.$_maybe['id_'.$criterion['table']]] = $value.' '.$criterion['display'];
+				}
+			}
+		}
+		return array($_resultout,$_param);
+	}
+}
+
+function trafficLightOld(array $PARAM,mysqli $conn)
 {
 	$tables = $PARAM['table'];
 	
@@ -362,6 +578,207 @@ function printDB(array $PARAM, mysqli $conn)
 	</form>
 	<div id="DBforprint<?php echo($rnd); ?>"></div>
 	<?php
+}
+
+function exportRefuKey($PARAM, mysqli $conn)
+{
+// $PARAM is the mass edit array
+	if ( isset($PARAM['trash']) ) { 
+		$_array = json_decode($PARAM['trash'],true);
+	} else {
+		$_array = $PARAM;
+	}
+	if ( ! isset($_array['massEdit']) ) { return; }
+	//write header
+	?>
+	<h3>refuKey-Export</h3>
+	<p>Fenster bitte nach dem Herunterladen schließen</p>
+	<?php
+	//get the ids of opsz_aufnahme
+	$_exported_ids = array ();
+	foreach( $_array['massEdit'] as $_idcollection ) {
+		$_idarray = json_decode($_idcollection,true);
+		if ( is_array($_idarray) AND isset($_idarray['id_opsz_aufnahme']) AND ! in_array($_idarray['id_opsz_aufnahme'],$_exported_ids) ) {
+			array_push($_exported_ids,$_idarray['id_opsz_aufnahme']);
+		}
+	}
+	$_exported_ids_string = '('.implode(',',$_exported_ids).')';
+	unset($_stmt_array); $_stmt_array = array();
+	//get the data from the database
+	$_stmt_array['stmt'] = "select tablemachine from os_tables where tablereadable LIKE '%refuKey%'";
+	$refukeytable = execute_stmt($_stmt_array,$conn)['result']['tablemachine'][0];
+	unset($_stmt_array); $_stmt_array = array();
+	$_stmt_array['stmt'] = 'select view__'.$refukeytable.'__'.$_SESSION['os_role'].'.code as code, fallnummerklinik as evalcode, erstkontaktrefukey, geschlecht, DATEDIFF(aufnahmedatum,geburtsdatum) AS age, begleitet, aufenthaltorig, indeutschlandseit, _gesundheitorig, familiehier, herkunft, minderheit, muttersprache, landkreisregion as landkreis, ueberleitung, ueberleitungnach, krankenhausaufenthalt, krankenhausaufenthaltdetails, anfragevon, symptome, diagnoseexternkombi, angebot, anmerkungen, dropout FROM view__opsz_aufnahme__'.$_SESSION['os_role'].' LEFT JOIN view__'.$refukeytable.'__'.$_SESSION['os_role'].' USING (id_opsz_aufnahme) WHERE id_opsz_aufnahme in '.$_exported_ids_string.' ORDER BY evalcode,code';
+	$_export_rawdata = execute_stmt($_stmt_array,$conn,true)['result']; //first index: number, second index: key
+	function _rewrite(string $xml, string $column, array $row) {
+		$replaceby = str_replace('*','',$row[strtolower($column)]);
+		//to be continued
+		switch($column) {
+			case 'CODE':
+				break;
+			case 'EVALCODE':
+				if ( $row['evalcode'] == '' ) { $replaceby = $row['code']; }
+				break;
+			case 'ERSTKONTAKTREFUKEY':
+				break;
+			case 'DERIV_GESCHLECHT_VULNERABILITAET':
+				switch($row['geschlecht']) {
+					case 'männlich':
+						$replaceby = 'm';
+						break;
+					case 'weiblich':
+						$replaceby = 'w';
+						break;
+					case 'divers':
+						$replaceby = 'd';
+						break;
+				}
+				if ( $row['age'] > 18*365+5 ) { $replaceby .= 'E'; } else { $replaceby .= 'M'; }
+				if ( $row['begleitet'] == "unbegleitet" ) { $replaceby .= 'u'; }
+				break;
+			case 'AUFENTHALTORIG':
+				break;
+			case 'INDEUTSCHLANDSEIT':
+				break;
+			case 'DERIV__GESUNDHEITORIG':
+				switch($row['_gesundheitorig']) {
+					case '*zu klären':
+						$replaceby = "Z";
+						break;
+					case 'Sozialamt':
+						$replaceby = "SO";
+						break;
+					case 'Krankenkasse':
+						$replaceby = "KK";
+						break;
+					case 'Krankenkasse über Sozialamt':
+						$replaceby = "SM";
+						break;
+					case 'keine':
+						$replaceby = "KL";
+						break;
+				}
+				break;
+			case 'FAMILIEHIER':
+				break;
+			case 'DERIV_HERKUNFT_MINDERHEIT':
+				$replaceby = $row['herkunft'].', '.$row['minderheit'];
+				break;
+			case 'MUTTERSPRACHE':
+				break;
+			case 'LANDKREIS':
+				break;
+			case 'UEBERLEITUNG':
+				if ( $row['ueberleitung'] == "*nein" OR $row['ueberleitung'] == "" ) { $replaceby = "nein"; }
+				break;
+			case 'UEBERLEITUNGNACH':
+				if ( $row['ueberleitungnach'] == "*nein" OR $row['ueberleitungnach'] == "" ) { $replaceby = "nein"; }
+				break;
+			case 'DERIV_KRANKENHAUSAUFENTHALTDETAILS':
+				if ( $row['krankenhausaufenthalt'] != "ja" ) { $replaceby = "nein"; break; }
+				$_aufenthalte = json_decode($row['krankenhausaufenthaltdetails']);
+				$komma = '';
+				for ( $i = 0; $i < sizeof($_aufenthalte[0]); $i++ ) {
+					$replaceby .= $komma.$_aufenthalte[0][$i].': '._cleanup($_aufenthalte[1][$i]).' - '._cleanup($_aufenthalte[2][$i]); $komma = ', ';
+				}
+				break;
+			case 'ANFRAGEVON':
+				break;
+			case 'SYMPTOME':
+				break;
+			case 'DERIV_DIAGNOSEEXTERNKOMBI':
+				$_diagnose = json_decode(str_replace('*','',$row['diagnoseexternkombi']));
+				$komma = '';
+				for ( $i = 0; $i < sizeof($_diagnose[0]); $i++ ) {
+					$_add = '';
+					if ( $_diagnose[1][$i] == "Verdachtsdiagnose" ) { $_add = 'V'; }
+					if ( $_diagnose[1][$i] == "Gesicherte Diagnose" ) { $_add = 'S'; }
+					$replaceby .= $komma.substr($_diagnose[0][$i],0,strpos($_diagnose[0][$i],' ')).' '.$_add;
+					$komma = ', ';
+				}
+				break;
+			case 'DERIV_ANGEBOT':
+				$angebote = json_decode($row['angebot'],true);
+				$komma = '';
+				foreach ($angebote as $angebot) {
+					$replaceby = substr($angebot,0,11);
+					switch(substr($row['angebot'],0,11)) {
+						case 'Einzelgespr':
+							$replaceby .= $komma.'Einzel';
+							$komma = ', ';
+							break;
+						case 'Gruppenange':
+							$replaceby .= $komma.'Gruppe';
+							$komma = ', ';
+							break;
+						case 'ambulant be':
+							$replaceby .= $komma.'Sonstiges';
+							$komma = ', ';
+							break;
+						case 'Projekt ASU':
+							$replaceby = $komma.'Sonstiges';
+							$komma = ', ';
+							break;
+					}
+			}
+				break;
+			case 'ANMERKIUNGEN':
+				break;
+			case 'DROPOUT':
+				break;
+		}
+		$replaceby = _cleanup($replaceby);
+		$_return = str_replace('%'.$column.'%',$replaceby,$xml);
+		return $_return;
+	}
+	$workdir = '../../core/xml/exportRefuKey/';
+	//remove line breaks from files, this makes it unreadable in the end...
+	$file_header = fopen($workdir.'exportRefuKey_content_header.xml','r');
+	$xml_header = fread($file_header,filesize($workdir.'exportRefuKey_content_header.xml'));
+	fclose($file_header);
+	$file_row = fopen($workdir.'exportRefuKey_content_row.xml','r');
+	$xml_row = fread($file_row,filesize($workdir.'exportRefuKey_content_row.xml'));
+	fclose($file_row);
+	$file_footer = fopen($workdir.'exportRefuKey_content_footer.xml','r');
+	$xml_footer = fread($file_footer,filesize($workdir.'exportRefuKey_content_footer.xml'));
+	fclose($file_footer);
+	preg_match_all("/%([A-Z_]*)%/",$xml_row,$placeholders);
+	$columns = $placeholders[1]; //takes the first bracket of the match
+	$_export_xml = $xml_header;
+	foreach ( $_export_rawdata as $index => $row ) {
+		$thisxml = str_replace('%ROWNUMBER%',$index,$xml_row);
+		foreach ( $columns as $column ) {
+			$thisxml = _rewrite($thisxml,$column,$row);
+		}
+		$_export_xml .= $thisxml;
+	}
+	$_export_xml .= $xml_footer;
+	$zip = new ZipArchive;
+	$fileToModify = 'content.xml';
+	$now = date('Y-m-d_His');
+	try { copy($workdir.'exportRefuKey-Vorlage.ods','/tmp/exportRefuKey-'.$now.'.ods'); } catch (Throwable $e) { echo "Captured Throwable: " . $e->getMessage() . PHP_EOL; }
+
+	if ($zip->open('/tmp/exportRefuKey-'.$now.'.ods') === TRUE) {
+		//Delete the old...
+		$zip->deleteName($fileToModify);
+		//Write the new...
+		$zip->addFromString($fileToModify, $_export_xml);
+		//And write back to the filesystem.
+		$zip->close();
+		$export_file = fopen('/tmp/exportRefuKey-'.$now.'.ods','r');
+		$export_ods = base64_encode(fread($export_file,filesize('/tmp/exportRefuKey-'.$now.'.ods')));
+		fclose($export_file);
+		unlink('/tmp/exportRefuKey-'.$now.'.ods');
+		$filename = 'exportRefuKey-'.$now.'.ods';
+		?>
+ 		<div class="download">
+			<label>&nbsp;</label>
+			<i class="fas fa-file-download"></i>&nbsp;&nbsp;<a href="data:application/vnd.oasis.opendocument.spreadsheet;charset=utf-8;base64,<?php echo($export_ods); ?>" target="_blank" download="<?php echo($filename); ?>"><?php echo($filename); ?> (ODS)</a>
+		</div>
+		<?php
+	} else {
+		echo 'Beim Erzeugen der ODS ist ein Fehler aufgetreten';
+	}
 }
 
 function createDB(array $PARAM, mysqli $conn)
