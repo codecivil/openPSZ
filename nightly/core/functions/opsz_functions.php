@@ -7,7 +7,7 @@ function substr_in_array($needle, array $haystack)
     }, false);
 }
 
-function trafficLight(array $PARAM, mysqli $conn)
+function trafficLight_new(array $PARAM, mysqli $conn)
 {
 	$tables = $PARAM['table'];
 	
@@ -215,7 +215,7 @@ function _parseCriterion(array $resultin, array $_param, array $criterion, mysql
 	}
 }
 
-function trafficLightOld(array $PARAM,mysqli $conn)
+function trafficLight(array $PARAM,mysqli $conn)
 {
 	$tables = $PARAM['table'];
 	
@@ -270,12 +270,11 @@ function trafficLightOld(array $PARAM,mysqli $conn)
 						$_rnd = rand(0,32767);
 						?>
 						<tr class="<?php html_echo($_class); ?>">
-							<td><?php html_echo($_result['name']); ?></td>
-							<td><?php html_echo($_result['vorname']); ?></td>
+							<td><?php html_echo($_table_result['name']); ?></td>
+							<td><?php html_echo($_table_result['vorname']); ?></td>
 							<td><?php html_echo($value); ?></td>
 							<td>
-								<form method="post" id="ampelForm_<?php echo($_rnd); ?>" class="inline" action="" onsubmit="callFunction(this,'getDetails','_popup_',false,'details'); return false;"><input form="ampelForm_<?php echo($_rnd); ?>" value="<?php echo($key); ?>" name="id_opsz_aufnahme" hidden="" type="text"><input form="ampelForm__<?php echo($_rnd); ?>" id="ampelSubmit__<?php echo($_rnd); ?>" hidden="" type="submit"></form>
-								<label for="ampelSubmit__<?php echo($_rnd); ?>"><i class="fas fa-address-card"></i></label>
+								<form method="post" id="ampelForm_<?php echo($_rnd); ?>" class="inline" action="" onsubmit="callFunction(this,'getDetails','_popup_',false,'details'); return false;"><input form="ampelForm_<?php echo($_rnd); ?>" value="<?php echo($key); ?>" name="id_opsz_aufnahme" hidden="" type="text"><input form="ampelForm__<?php echo($_rnd); ?>" id="ampelSubmit__<?php echo($_rnd); ?>" hidden="" type="submit"></form><label for="ampelSubmit__<?php echo($_rnd); ?>"><i class="fas fa-address-card"></i></label>
 							</td>							
 						</tr>
 						<?php
@@ -317,12 +316,11 @@ function trafficLightOld(array $PARAM,mysqli $conn)
 						$_rnd = rand(0,32767);
 						?>
 						<tr class="<?php html_echo($_class); ?>">
-							<td><?php html_echo($_result['name']); ?></td>
-							<td><?php html_echo($_result['vorname']); ?></td>
+							<td><?php html_echo($_table_result['name']); ?></td>
+							<td><?php html_echo($_table_result['vorname']); ?></td>
 							<td><?php html_echo($value); ?></td>
 							<td>
-								<form method="post" id="ampelForm_<?php echo($_rnd); ?>" class="inline" action="" onsubmit="callFunction(this,'getDetails','_popup_',false,'details'); return false;"><input form="ampelForm_<?php echo($_rnd); ?>" value="<?php echo($key); ?>" name="id_opsz_aufnahme" hidden="" type="text"><input form="ampelForm__<?php echo($_rnd); ?>" id="ampelSubmit__<?php echo($_rnd); ?>" hidden="" type="submit"></form>
-								<label for="ampelSubmit__<?php echo($_rnd); ?>"><i class="fas fa-address-card"></i></label>
+								<form method="post" id="ampelForm_<?php echo($_rnd); ?>" class="inline" action="" onsubmit="callFunction(this,'getDetails','_popup_',false,'details'); return false;"><input form="ampelForm_<?php echo($_rnd); ?>" value="<?php echo($key); ?>" name="id_opsz_aufnahme" hidden="" type="text"><input form="ampelForm__<?php echo($_rnd); ?>" id="ampelSubmit__<?php echo($_rnd); ?>" hidden="" type="submit"></form><label for="ampelSubmit__<?php echo($_rnd); ?>"><i class="fas fa-address-card"></i></label>
 							</td>							
 						</tr>
 						<?php
@@ -367,13 +365,12 @@ function trafficLightOld(array $PARAM,mysqli $conn)
 						$_rnd = rand(0,32767);
 						?>
 						<tr class="<?php html_echo($_class); ?>">
-							<td><?php html_echo($_result['name']); ?></td>
-							<td><?php html_echo($_result['vorname']); ?></td>
+							<td><?php html_echo($_table_result['name']); ?></td>
+							<td><?php html_echo($_table_result['vorname']); ?></td>
 							<td><?php html_echo($_result['listentyp']); ?></td>
 							<td><?php html_echo($value); ?></td>
 							<td>
-								<form method="post" id="ampelForm_<?php echo($_rnd); ?>" class="inline" action="" onsubmit="callFunction(this,'getDetails','_popup_',false,'details'); return false;"><input form="ampelForm_<?php echo($_rnd); ?>" value="<?php echo($key); ?>" name="id_opsz_aufnahme" hidden="" type="text"><input form="ampelForm__<?php echo($_rnd); ?>" id="ampelSubmit__<?php echo($_rnd); ?>" hidden="" type="submit"></form>
-								<label for="ampelSubmit__<?php echo($_rnd); ?>"><i class="fas fa-address-card"></i></label>
+								<form method="post" id="ampelForm_<?php echo($_rnd); ?>" class="inline" action="" onsubmit="callFunction(this,'getDetails','_popup_',false,'details'); return false;"><input form="ampelForm_<?php echo($_rnd); ?>" value="<?php echo($key); ?>" name="id_opsz_aufnahme" hidden="" type="text"><input form="ampelForm__<?php echo($_rnd); ?>" id="ampelSubmit__<?php echo($_rnd); ?>" hidden="" type="submit"></form><label for="ampelSubmit__<?php echo($_rnd); ?>"><i class="fas fa-address-card"></i></label>
 							</td>							
 						</tr>
 						<?php
