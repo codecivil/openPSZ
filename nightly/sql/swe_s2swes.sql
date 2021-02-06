@@ -16,7 +16,7 @@ BEGIN
 	select FOUND_ROWS() into num_rows;
 
 	CREATE TEMPORARY TABLE swetranslate (colname VARCHAR(40), _swe VARCHAR(60));
-	INSERT INTO swetranslate VALUES ('swe_hausarzt','HausärztIn'),('swe_psychiater','PsychiaterIn'),('swe_unterstuetzer','UnterstützerIn'),('swe_rechtsanwalt','RechtsanwältIn'),('swe_krankenversicherung','Krankenvers. und Lebensunterhalt'),('swe_familienhilfe','Familienhilfe'),('swe_beratungsstellen','Beratungsstellen'),('swe_psychotherapeut','PsychotherapeutIn');
+	INSERT INTO swetranslate VALUES ('swe_hausarzt','Hausarzt / Hausärztin'),('swe_psychiater','Psychiater*in / Neurolog*in'),('swe_unterstuetzer','Unterstützer*in'),('swe_rechtsanwalt','Rechtsanwalt / Rechtsanwältin'),('swe_krankenversicherung','Krankenkasse'),('swe_familienhilfe','Familienhilfe'),('swe_beratungsstellen','Beratungsstellen'),('swe_psychotherapeut','Psycholog*innen/Psychotherapeut*innen');
 
 	UPDATE opsz_aufnahme SET swes = '[]';
 	
