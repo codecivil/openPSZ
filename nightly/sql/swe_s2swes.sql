@@ -1,9 +1,10 @@
 ---
 --- DO NOT IMPORT THIS USING openStatAdmin! DO IT BY COMMAND LINE LIKE mysql -u root -p opsz < swe_s2swes.sql ! openStatAdmin DOES NOT SUPPORT PROCEDURES!
 ---
+DROP PROCEDURE IF EXISTS _convert;
 
 DELIMITER //
-CREATE PROCEDURE _s()
+CREATE PROCEDURE _convert()
 BEGIN
 	DECLARE num_rows,i INT;
 	DECLARE col_name VARCHAR(255);
@@ -18,7 +19,7 @@ BEGIN
 	CREATE TEMPORARY TABLE swetranslate (colname VARCHAR(40), _swe VARCHAR(60));
 	INSERT INTO swetranslate VALUES ('swe_hausarzt','Hausarzt / Hausärztin'),('swe_psychiater','Psychiater*in / Neurolog*in'),('swe_unterstuetzer','Unterstützer*in'),('swe_rechtsanwalt','Rechtsanwalt / Rechtsanwältin'),('swe_krankenversicherung','Krankenkasse'),('swe_familienhilfe','Familienhilfe'),('swe_beratungsstellen','Beratungsstellen'),('swe_psychotherapeut','Psycholog*innen/Psychotherapeut*innen');
 
-	UPDATE opsz_aufnahme SET swes = '[]';
+	UPDATE opsz_aufnahme SET schweigen = '[]';
 	
 	SET i = 1;
 	the_loop: LOOP
@@ -32,15 +33,20 @@ BEGIN
 		FETCH col_names 
 		INTO col_name;
 		SELECT _swe FROM swetranslate WHERE colname = col_name INTO @_swe;
-		SET @stmt := CONCAT('UPDATE opsz_aufnahme set swes =  JSON_MERGE_PRESERVE(CONCAT(\'[\"',@_swe,'\"]\'),swes) WHERE ',col_name,' = \"ja\"');
+/*this works, too, but may be less efficient:
+		SET @stmt := CONCAT('UPDATE opsz_aufnahme set schweigen =  JSON_MERGE_PRESERVE(CONCAT(\'[\"',@_swe,'\"]\'),schweigen) WHERE ',col_name,' = \"ja\"');
+*/
+		SET @stmt := CONCAT('UPDATE opsz_aufnahme set schweigen =  JSON_ARRAY_APPEND(schweigen,\'\$\',@_swe) WHERE ',col_name,' = \"ja\"');
 		PREPARE stmt from @stmt;
 		EXECUTE stmt;
 		DEALLOCATE PREPARE stmt;
 		SET i = i + 1;  
 	END LOOP the_loop;
 	DROP TABLE swetranslate;
+	/* empty values make problems in edit.php, so: */
+	UPDATE opsz_aufnahme SET schweigen = '[""]' WHERE schweigen = '[]';
 END; //
 
 DELIMITER ;
-CALL _s;
-DROP PROCEDURE _s;
+CALL _convert;
+DROP PROCEDURE _convert;
