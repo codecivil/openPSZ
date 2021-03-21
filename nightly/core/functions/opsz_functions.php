@@ -475,6 +475,10 @@ function exportRefuKey($PARAM, mysqli $conn)
 			case 'ANFRAGEVON':
 				break;
 			case 'SYMPTOME':
+				$replaceby = strip_tags(_cleanup($row['symptome']));
+				break;
+			case 'ANMERKUNGEN':
+				$replaceby = strip_tags(_cleanup($row['anmerkungen']));
 				break;
 			case 'DERIV_DIAGNOSEEXTERNKOMBI':
 				$_diagnose = json_decode(str_replace('*','',$row['diagnoseexternkombi']));

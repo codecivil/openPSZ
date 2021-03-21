@@ -1,3 +1,9 @@
+v1.5.14
+=======
+21.03.2021
+
+* Bugfix in exportRefuKey: Umlaute und HTML wurden falsch behandelt
+
 v1.5.11-2
 ======
 06.02.2021
