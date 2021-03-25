@@ -474,11 +474,12 @@ function exportRefuKey($PARAM, mysqli $conn)
 				break;
 			case 'ANFRAGEVON':
 				break;
+			//html_entitiy_decode included in the next two sections for backward compatibility: old entries may contain &ouml; etc which are invalid in XML
 			case 'SYMPTOME':
-				$replaceby = strip_tags(_cleanup($row['symptome']));
+				$replaceby = strip_tags(_cleanup(html_entity_decode($row['symptome'],ENT_HTML5)));
 				break;
 			case 'ANMERKUNGEN':
-				$replaceby = strip_tags(_cleanup($row['anmerkungen']));
+				$replaceby = strip_tags(_cleanup(html_entity_decode($row['anmerkungen'],ENT_HTML5)));
 				break;
 			case 'DERIV_DIAGNOSEEXTERNKOMBI':
 				$_diagnose = json_decode(str_replace('*','',$row['diagnoseexternkombi']));
