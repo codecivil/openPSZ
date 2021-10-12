@@ -1,6 +1,7 @@
 <?php 
 error_reporting(0); //just in case the webserver does not comply...
 session_start();
+mysqli_report(MYSQLI_REPORT_STRICT); //in order to see MySQL exceptions
 require_once('../../core/functions/db_functions.php');
 require_once('../../core/classes/auth.php');
 require_once('../../core/data/serverdata.php');
@@ -38,14 +39,18 @@ if ( isset($_SESSION['e']) AND ! $_SESSION['e'] ) { header('Refresh:0; url=/logi
 if ( isset($_SESSION['e']) ) { $disabled = "disabled"; }
 
 // Create connection
-$conn = new mysqli($servername, $username, $password, $dbname) or die ("Connection failed.");
+try {
+	$conn = new mysqli($servername, $username, $password, $dbname); 
+} catch(Exception $e) {
+	exit;
+}
 mysqli_set_charset($conn,"utf8");
 //login
 
 if ( isset($PARAMETER['user']) AND isset($PARAMETER['password']) AND $PARAMETER['user'] != '' ) {
 	$_login = new OpenStatAuth($PARAMETER['user'],$PARAMETER['password'],$conn);
 	$_success = $_login->login();
-	if ( ! isset($_success['error']) ) { header('Refresh:0; url=/index.php'); };
+	if ( ! isset($_success['error']) ) { header('Refresh:0; url=/index.php');  $conn->close(); exit(); };
 	unset($PARAMETER);
 } 
 
