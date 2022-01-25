@@ -522,7 +522,7 @@ function exportRefuKey($PARAM, mysqli $conn)
 			case 'DROPOUT':
 				break;
 		}
-		$replaceby = _cleanup($replaceby);
+		$replaceby = htmlentities(_cleanup($replaceby),ENT_XML1); //only this step ensures that the ODS date are XML1-compliant!
 		$_return = str_replace('%'.$column.'%',$replaceby,$xml);
 		return $_return;
 	}

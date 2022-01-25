@@ -1,3 +1,9 @@
+v1.6.3
+=======
+25.01.2022
+
+* Funktion exportRefuKey liefert nun sichere XML1-Strings im ODS-File
+
 v1.5.22
 =======
 12.10.2021
