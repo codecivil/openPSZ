@@ -1,0 +1,22 @@
+-- give more chars to termine fields
+ALTER TABLE opsz_termine MODIFY bei VARCHAR(80); 
+ALTER TABLE opsz_termine MODIFY titel VARCHAR(80); 
+ALTER TABLE opsz_termine MODIFY dolmetscher VARCHAR(80); 
+UPDATE opsz_termine_permissions SET typelist = 'VARCHAR(80)' where keymachine = 'bei';
+UPDATE opsz_termine_permissions SET typelist = 'VARCHAR(80)' where keymachine = 'titel';
+UPDATE opsz_termine_permissions SET typelist = 'VARCHAR(80)' where keymachine = 'dolmetscher';
+-- add field of type NOTE to aufnahme
+ALTER TABLE `opsz_aufnahme` ADD COLUMN `notiz` TEXT DEFAULT NULL;
+INSERT  INTO `opsz_aufnahme_permissions` (`keymachine`,`keyreadable`,`realid`,`typelist`,`edittype`,`role_0`) SELECT 'notiz','Notiz','2.2','TEXT','NOTE','0' FROM DUAL WHERE (SELECT count(*) FROM information_schema.COLUMNS WHERE TABLE_NAME = 'opsz_aufnahme' AND COLUMN_NAME = 'notiz') > 0 AND (SELECT count(keymachine) FROM `opsz_aufnahme_permissions` where keymachine = 'notiz') = 0;
+-- change angebotedetail to HIDE/SHOW
+UPDATE `opsz_aufnahme_references`SET `referencetag`= '_angebotedetail',`allowed_values`= '["_HIDE_"]' WHERE `depends_on_key` IS NULL;
+UPDATE `opsz_aufnahme_references`SET `referencetag`= '_angebotedetail',`depends_on_key`= 'angebot',`depends_on_value`= 'Einzelgespräche',`allowed_values`= '["*zu klären","kurz - 10 Termine","mittel - 20 Termine","langfristig - über 20 Termine","_SHOW_"]' WHERE `referencetag`= '_angebotedetail' AND `depends_on_key`= 'angebot' AND `depends_on_value`= 'Einzelgespräche';
+UPDATE `opsz_aufnahme_references`SET `referencetag`= '_angebotedetail',`depends_on_key`= 'angebot',`depends_on_value`= 'bei psychosozialer Beratung',`allowed_values`= '["*zu klären","PsychologIn","PsychotherapeutIn","ASU Projekt","Sonstige Projekte","_SHOW_"]' WHERE `referencetag`= '_angebotedetail' AND `depends_on_key`= 'angebot' AND `depends_on_value`= 'bei psychosozialer Beratung';
+UPDATE `opsz_aufnahme_references`SET `referencetag`= '_angebotedetail',`depends_on_key`= 'angebot',`depends_on_value`= 'Entspannungsgruppe',`allowed_values`= '["_SHOW_"]' WHERE `referencetag`= '_angebotedetail' AND `depends_on_key`= 'angebot' AND `depends_on_value`= 'Entspannungsgruppe';
+UPDATE `opsz_aufnahme_references`SET `referencetag`= '_angebotedetail',`depends_on_key`= 'angebot',`depends_on_value`= 'Vermitlung in Fachberatung',`allowed_values`= '["*zu klären","ausländerrechtlich","sozialrechtlich","Lebensberatung, psychosoziale Beratung","Suchtberatung","_SHOW_"]' WHERE `referencetag`= '_angebotedetail' AND `depends_on_key`= 'angebot' AND `depends_on_value`= 'Vermitlung in Fachberatung';
+UPDATE `opsz_aufnahme_references`SET `referencetag`= '_angebotedetail',`depends_on_key`= 'angebot',`depends_on_value`= 'Vermittlung in die Regelversorgung',`allowed_values`= '["*zu klären","stationäre Aufnahme","auf der Vermittlungsliste Psychiater","auf der Vermittlungsliste Psychotherapeut","_SHOW_"]' WHERE `referencetag`= '_angebotedetail' AND `depends_on_key`= 'angebot' AND `depends_on_value`= 'Vermittlung in die Regelversorgung';
+UPDATE `opsz_aufnahme_references`SET `referencetag`= '_angebotedetail',`depends_on_key`= 'angebot',`depends_on_value`= 'Kreativgruppe',`allowed_values`= '["_SHOW_"]' WHERE `referencetag`= '_angebotedetail' AND `depends_on_key`= 'angebot' AND `depends_on_value`= 'Kreativgruppe';
+UPDATE `opsz_aufnahme_references`SET `referencetag`= '_angebotedetail',`depends_on_key`= 'angebot',`depends_on_value`= 'Entspannungsgruppe',`allowed_values`= '["_SHOW_"]' WHERE `referencetag`= '_angebotedetail' AND `depends_on_key`= 'angebot' AND `depends_on_value`= 'Entspannungsgruppe';
+UPDATE `opsz_aufnahme_references`SET `referencetag`= '_angebotedetail',`depends_on_key`= 'angebot',`depends_on_value`= 'Stabilisierungsgruppe',`allowed_values`= '["_SHOW_"]' WHERE `referencetag`= '_angebotedetail' AND `depends_on_key`= 'angebot' AND `depends_on_value`= 'Stabilisierungsgruppe';
+UPDATE `opsz_aufnahme_references`SET `referencetag`= '_angebotedetail',`depends_on_key`= 'angebot',`depends_on_value`= 'geschlechtsspezifische Gruppe',`allowed_values`= '["_SHOW_"]' WHERE `referencetag`= '_angebotedetail' AND `depends_on_key`= 'angebot' AND `depends_on_value`= 'geschlechtsspezifische Gruppe';
+UPDATE `opsz_aufnahme_references`SET `referencetag`= '_angebotedetail',`depends_on_key`= 'angebot',`depends_on_value`= 'weitere Gruppenangebot bis August 2022',`allowed_values`= '["_SHOW_"]' WHERE `referencetag`= '_angebotedetail' AND `depends_on_key`= 'angebot' AND `depends_on_value`= 'weitere Gruppenangebot bis August 2022';
