@@ -1,3 +1,22 @@
+v1.7.8
+=======
+14.01.2023
+
+* Anpassungen der Vermittlungslisten und der Ampelfunktion (hängt von openStat-v1.7.8 ab)
+
+v1.7.7
+=======
+26.08.2022
+
+* kleinere Änderungen im angebotedetail (_SHOW_/_HIDE)) in aufnahme
+* neues Feld notiz vom Typ NOTE in aufnahme
+
+v1.7.6
+=======
+09.08.2022
+
+* Änderungen im Gruppenangebot
+
 v1.6.3
 =======
 25.01.2022
