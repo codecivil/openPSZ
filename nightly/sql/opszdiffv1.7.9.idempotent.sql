@@ -1,0 +1,7 @@
+-- aktiv:2023, Familie hier: zum Teil und Familengespräche
+UPDATE `opsz_aufnahme_references` SET `referencetag`= '_jahr',`depends_on_key`= 'aktiv',`depends_on_value`= 'nein',`allowed_values`= '["2015","2016","2017","2018","2019","2020","2021","2022","2023"]' WHERE `referencetag`= '_jahr' AND `depends_on_key`= 'aktiv';
+UPDATE `opsz_evaluation_permissions` SET `keymachine`= 'familiehier',`keyreadable`= 'Familie hier',`realid`= '7.000',`typelist`= 'VARCHAR(8)',`edittype`= 'LIST',`referencetag`= '_familiehier' WHERE `keymachine`= 'familiehier';
+INSERT  INTO `opsz_evaluation_references` (`referencetag`,`allowed_values`) VALUES ('_familiehier','["ja","*nein","zum Teil"]');
+UPDATE `opsz_aufnahme_references` SET `referencetag`= '_angebote',`allowed_values`= '["*zu klären","OS","Einzelgespräche","Familiengespräche","Kreativgruppe", "Entspannungsgruppe","Stabilisierungsgruppe","geschlechtsspezifische Gruppe","weitere Gruppenangebote bis August 2022","Vermittlung in die Regelversorgung","Vermittlung: Beratungsstelle","Vermittlung: PsychiaterIn","Vermittlung: Psychotherapie","Vermittlung: Rolling clinic","ambulant betreutes Wohnen","Projekt ASU"]' WHERE `referencetag`= '_angebote';
+UPDATE `opsz_termine_references` SET `referencetag`= '_termineart',`allowed_values`= '["OS","Einzelgespräch","Familiengespräch","Vermittlung","Kreativgruppe","Entspannungsgruppe","Stabilisierungsgruppe","geschlechtsspezifische Gruppe","*Sonstiges"]' WHERE `referencetag`= '_termineart';
+-- openStatAdmin-log finished 28.02.2023 09:46:39
