@@ -31,7 +31,7 @@ INSERT  INTO `opsz_vermittlungslisten_references` (`referencetag`,`allowed_value
 ALTER TABLE `opsz_vermittlungslisten` ADD COLUMN `kontaktdaten` TEXT DEFAULT NULL;
 INSERT  INTO `opsz_vermittlungslisten_permissions` (`keymachine`,`keyreadable`,`realid`,`typelist`,`edittype`) SELECT 'kontaktdaten','Kontaktdaten / Bemerkungen','12.8','TEXT','FREE' FROM DUAL WHERE (SELECT count(*) FROM information_schema.COLUMNS WHERE TABLE_NAME = 'opsz_vermittlungslisten' AND COLUMN_NAME = 'kontaktdaten') > 0 AND (SELECT count(keymachine) FROM `opsz_vermittlungslisten_permissions` where keymachine = 'kontaktdaten') = 0;
 
---Einträge Zweitantrag wird zu Folgeantrag
+-- Einträge Zweitantrag wird zu Folgeantrag
 UPDATE opsz_vermittlungslisten set therapieantrag = REPLACE(therapieantrag,"Zweitantrag","Folgeantrag");
 UPDATE opsz_vermittlungslisten set dolmetscherinnenantrag = REPLACE(dolmetscherinnenantrag,"Zweitantrag","Folgeantrag");
 UPDATE opsz_vermittlungslisten set fahrtkostenantrag = REPLACE(fahrtkostenantrag,"Zweitantrag","Folgeantrag");
