@@ -1,9 +1,5 @@
 -- Vermittlungsänderungen --
 
--- Aufnahmebogen --
-ALTER TABLE `opsz_aufnahme` DROP COLUMN `vermittlungsstand`;
-DELETE FROM `opsz_aufnahme_permissions` WHERE keymachine = 'vermittlungsstand';
-
 -- Termine und Dok --
 UPDATE `opsz_termine_permissions`SET `typelist`= 'TEXT',`edittype`= 'FREE' WHERE `keymachine`= 'dolmetscher';
 
