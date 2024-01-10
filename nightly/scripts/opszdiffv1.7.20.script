@@ -1,0 +1,34 @@
+# DO NOT SUBMIT EMPTY FIELDS! SORRY!
+#
+# create opsz_dolmetschereinsatz
+# with usual permssions for all
+# and basic column definitions;
+# e.g. references, modifiers etc are added later in a sql file
+#
+?table=os_tables&iconname=globe&tablemachine=opsz_dolmetschereinsatz&tablereadable=Dolmetschereinsatz&allowed_roles=%5B0%5D&delete_roles=%5B0%5D&dbAction=insert
+?table=opsz_dolmetschereinsatz_permissions&keymachine=dolmiordernrintern&keyreadable=Auftragsnummer%20intern&realid=3&typelist=VARCHAR(30)&edittype=TEXT&role_0=0&dbAction=insert
+?table=opsz_dolmetschereinsatz_permissions&keymachine=dolmiordernrextern&keyreadable=Auftragsnummer%20extern&realid=3.5&typelist=VARCHAR(30)&edittype=TEXT&role_0=0&dbAction=insert
+?table=opsz_dolmetschereinsatz_permissions&keymachine=dolmistatus&keyreadable=Status&realid=4&typelist=VARCHAR(20)&edittype=TEXT&role_0=0&dbAction=insert
+?table=opsz_dolmetschereinsatz_permissions&keymachine=dolmisprache&keyreadable=Sprache&realid=5&typelist=VARCHAR(40)&edittype=TEXT&role_0=0&dbAction=insert
+?table=opsz_dolmetschereinsatz_permissions&keymachine=dolminetto&keyreadable=Nettobetrag&realid=6&typelist=DECIMAL(6,2)&edittype=DECIMAL&role_0=0&dbAction=insert
+?table=opsz_dolmetschereinsatz_permissions&keymachine=dolmibrutto&keyreadable=Bruttobetrag&realid=7&typelist=DECIMAL(6,2)&edittype=DECIMAL&role_0=0&dbAction=insert
+?table=opsz_dolmetschereinsatz_permissions&keymachine=dolmimwst&keyreadable=MwSt&realid=8&typelist=DECIMAL(6,2)&edittype=DECIMAL&role_0=0&dbAction=insert
+#
+# create opsz_dolmetscherrechnung
+# with usual permssions for all
+# and basic column definitions;
+# e.g. references, modifiers etc are added later in a sql file
+#
+?table=os_tables&iconname=sack-dollar&tablemachine=opsz_dolmetscherrechnung&tablereadable=Dolmetscherrechnung&allowed_roles=%5B0%5D&delete_roles=%5B0%5D&dbAction=insert
+?table=opsz_dolmetscherrechnung_permissions&keymachine=dlmrggenerated&keyreadable=Rechnung%20erzeugt&realid=3&typelist=VARCHAR(30)&edittype=TEXT&role_0=0&dbAction=insert
+?table=opsz_dolmetscherrechnung_permissions&keymachine=dlmrgnr&keyreadable=Rechnungsnummer&realid=3.7&typelist=VARCHAR(20)&edittype=TEXT&role_0=0&dbAction=insert
+?table=opsz_dolmetscherrechnung_permissions&keymachine=dlmrgstaffnr&keyreadable=BearbeiterIn-Nummer&realid=4&typelist=VARCHAR(20)&edittype=TEXT&role_0=0&dbAction=insert
+?table=opsz_dolmetscherrechnung_permissions&keymachine=dlmrgaddr&keyreadable=Adresse&realid=5&typelist=TEXT&edittype=FREELONGER&role_0=0&dbAction=insert
+?table=opsz_dolmetscherrechnung_permissions&keymachine=dlmrgbei&keyreadable=Termine%20bei&realid=6&typelist=VARCHAR(40)&edittype=TEXT&role_0=0&dbAction=insert
+?table=opsz_dolmetscherrechnung_permissions&keymachine=dlmrgbeginn&keyreadable=Termine%20ab&realid=7&typelist=DATE&edittype=DATE&role_0=0&dbAction=insert
+?table=opsz_dolmetscherrechnung_permissions&keymachine=dlmrgend&keyreadable=Termine%20bis&realid=8&typelist=DATE&edittype=DATE&role_0=0&dbAction=insert
+?table=opsz_dolmetscherrechnung_permissions&keymachine=dlmrgnetto&keyreadable=Nettobetrag&realid=9&typelist=DECIMAL(6,2)&edittype=DECIMAL&role_0=0&dbAction=insert
+?table=opsz_dolmetscherrechnung_permissions&keymachine=dlmrgbrutto&keyreadable=Bruttobetrag&realid=10&typelist=DECIMAL(6,2)&edittype=DECIMAL&role_0=0&dbAction=insert
+?table=opsz_dolmetscherrechnung_permissions&keymachine=dlmrgmwst&keyreadable=MwSt&realid=11&typelist=DECIMAL(6,2)&edittype=DECIMAL&role_0=0&dbAction=insert
+?table=opsz_dolmetscherrechnung_permissions&keymachine=dlmrgtext&keyreadable=Rechnungstext&realid=12&typelist=TEXT&edittype=FREELONGER&role_0=0&dbAction=insert
+?table=opsz_dolmetscherrechnung_permissions&keymachine=dlmrgbemerkung&keyreadable=interne%20Notiz&realid=13&typelist=TEXT&edittype=FREELONGER&role_0=0&dbAction=insert

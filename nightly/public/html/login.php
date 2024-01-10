@@ -34,7 +34,6 @@ if ( isset($PARAMETER['e']) ) {
 	if ( isset($_SESSION['e']) ) { $_SESSION['e'] = ! $_SESSION['e']; } else { $_SESSION['e'] = true; }
 	unset($PARAMETER['e']);	
 } else { unset($_SESSION['e']); };
-
 if ( isset($_SESSION['e']) AND ! $_SESSION['e'] ) { header('Refresh:0; url=/login.php'); };
 if ( isset($_SESSION['e']) ) { $disabled = "disabled"; }
 
@@ -45,8 +44,8 @@ try {
 	exit;
 }
 mysqli_set_charset($conn,"utf8");
-//login
 
+//login
 if ( isset($PARAMETER['user']) AND isset($PARAMETER['password']) AND $PARAMETER['user'] != '' ) {
 	$_login = new OpenStatAuth($PARAMETER['user'],$PARAMETER['password'],$conn);
 	$_success = $_login->login();
