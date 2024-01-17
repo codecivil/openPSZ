@@ -1,4 +1,7 @@
 -- BITTE ERST NACH opszdiff1.7.20.script AUSFÜHREN!
+-- Defaulteinträge, damit keine Fehler wegen leerer Tabellen auftritt
+INSERT INTO opsz_dolmetschereinsatz (dolmiordernrintern) VALUES ('_none_');
+INSERT INTO opsz_dolmetscherrechnung (dlmrgnr) VALUES ('_none_');
 -- dolmetschereinsatz anpassen
 UPDATE `opsz_dolmetschereinsatz_permissions`SET `keymachine`= 'dolmimwst',`keyreadable`= 'MwSt',`typelist`= 'DECIMAL(6,2)',`edittype`= 'DECIMAL; DERIVED',`defaultvalue`= '(dolmibrutto-dolminetto)' WHERE `keymachine` = 'dolmimwst';
 UPDATE `opsz_dolmetschereinsatz_permissions`SET `keymachine`= 'dolmisprache',`keyreadable`= 'Sprache',`typelist`= 'VARCHAR(40)',`edittype`= 'EXTENSIBLE LIST' WHERE `keymachine` = 'dolmisprache';
