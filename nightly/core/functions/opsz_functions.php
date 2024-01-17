@@ -690,8 +690,15 @@ function createDB(array $PARAM, mysqli $conn)
 	}
 }
 
+//subfunctions of createDolmiInvoice
+// dependencies: php7.3-zip? Not for HTML version
+function localFormat($number) { return number_format((float)$number,2,",","."); }
+//function inTegers($number) { return number_format((float)$number,0,",","."); }
+function inCents($number) { return round((float)$number,2); }
+function inTegers($number) { return round((float)$number); }
+
 //scope: DETAILS
-function createInvoice(array $PARAM, mysqli $conn)
+function createDolmiInvoice(array $PARAM, mysqli $conn)
 {
 	//determine intended invoice
 	$PARAM2 = json_decode(json_encode($PARAM),true);
@@ -712,7 +719,7 @@ function createInvoice(array $PARAM, mysqli $conn)
 	}
 	//get invoice data
 	unset($_stmt_array); $_stmt_array = array(); unset($_table_result);
-	$_stmt_array['stmt'] = 'SELECT * from view__opsz_dolmetscherrechnung__'.$_SESSION['os_role'].' WHERE id_opsz_dolmetscherrechnung = ?';
+	$_stmt_array['stmt'] = 'SELECT name AS dlmrgname,vorname AS dlmrgvorname,geburtsdatum AS dlmrggeb,vermittlungsauftrag AS dlmrgtype, view__opsz_dolmetscherrechnung__'.$_SESSION['os_role'].'.* from view__opsz_dolmetscherrechnung__'.$_SESSION['os_role'].' LEFT JOIN view__opsz_vermittlungslisten__'.$_SESSION['os_role'].' USING (id_opsz_vermittlungslisten) LEFT JOIN view__opsz_aufnahme__'.$_SESSION['os_role'].' ON view__opsz_vermittlungslisten__'.$_SESSION['os_role'].'.id_opsz_aufnahme = view__opsz_aufnahme__'.$_SESSION['os_role'].'.id_opsz_aufnahme WHERE view__opsz_dolmetscherrechnung__'.$_SESSION['os_role'].'.id_opsz_dolmetscherrechnung = ?';
 	$_stmt_array['str_types'] = 'i';
 	$_stmt_array['arr_values'] = array($PARAM['id_opsz_dolmetscherrechnung']);
 	$PARAMETER = execute_stmt($_stmt_array,$conn,true)['result'][0];
@@ -727,88 +734,79 @@ function createInvoice(array $PARAM, mysqli $conn)
 	if ( ! isset($_customer_result) OR sizeof($_customer_result) == 0 ) { echo("<label><i class=\"fas fa-exclamation-triangle\"></i></label>Die Rechnung ist keiner KlientIn zugeordnet."); return; }
 	//set attributions if necessary
 	//do not change already set attributions even if they match the criteria
-	unset($_stmt_array); $_stmt_array = array(); unset($_table_result);
-	$_stmt_array['stmt'] = 'SELECT id_opsz_dolmetschereinsatz from view__opsz_dolmetschereinsatz__'.$_SESSION['os_role'].' LEFT JOIN view__opsz_termine__'.$_SESSION['os_role'].' USING (id_opsz_termine) WHERE view__opsz_dolmetschereinsatz__'.$_SESSION['os_role'].'.id_opsz_dolmetscherrchung ID NOT NULL AND view__opsz_termine__'.$_SESSION['os_role'].'.id_opsz_aufnahme = ?';
-	$_stmt_array['str_types'] = 'i';
-	$_stmt_array['arr_values'] = array($PARAMETER['id_opsz_aufnahme']);
-	if ( isset($PARAMETER['dlmrgbei']) AND $PARAMETER['dlmrgbei'] != '' ) {
-		$_stmt_array['stmt'] .= ' AND view__opsz_termine__'.$_SESSION['os_role'].'.bei = ?';
-		$_stmt_array['str_types'] .= 'i';
-		$_stmt_array['arr_values'][] = $PARAMETER['dlmrgbei'];
+	if ( isset($PARAMETER['dlmrgfilter']) ) {
+		$_filter = json_decode($PARAMETER['dlmrgfilter'],true);
+		//$_filter must have three components
+		if ( is_array($_filter) AND sizeof($_filter) == 3 AND sizeof($_filter[0]) > 0 ) {
+			$_length = sizeof($_filter[0]);
+			for ( $_filterindex = 0; $_filterindex < $_length; $_filterindex++ ) {
+				$PARAMETER['dlmrgbei'] = $_filter[0][$_filterindex];
+				$PARAMETER['dlmrgbeginn'] = $_filter[1][$_filterindex];
+				$PARAMETER['dlmrgend'] = $_filter[2][$_filterindex];
+				unset($_stmt_array); $_stmt_array = array(); unset($_table_result);
+				$_stmt_array['stmt'] = 'SELECT view__opsz_dolmetschereinsatz__'.$_SESSION['os_role'].'.id_opsz_dolmetschereinsatz from view__opsz_dolmetschereinsatz__'.$_SESSION['os_role'].' LEFT JOIN view__opsz_termine__'.$_SESSION['os_role'].' USING (id_opsz_termine) WHERE view__opsz_dolmetschereinsatz__'.$_SESSION['os_role'].'.id_opsz_dolmetscherrechnung IS NULL AND view__opsz_termine__'.$_SESSION['os_role'].'.id_opsz_vermittlungslisten = ?'; //collect all matching a certain vermittlungsliste!
+				$_stmt_array['str_types'] = 'i';
+				$_stmt_array['arr_values'] = array($PARAMETER['id_opsz_vermittlungslisten']);
+				if ( isset($PARAMETER['dlmrgbei']) AND $PARAMETER['dlmrgbei'] != '' ) {
+					$_stmt_array['stmt'] .= ' AND view__opsz_termine__'.$_SESSION['os_role'].'.bei = ?';
+					$_stmt_array['str_types'] .= 's';
+					$_stmt_array['arr_values'][] = $PARAMETER['dlmrgbei'];
+				}
+				if ( isset($PARAMETER['dlmrgbeginn']) AND $PARAMETER['dlmrgbeginn'] != '' ) {
+					$_stmt_array['stmt'] .= ' AND view__opsz_termine__'.$_SESSION['os_role'].'.beginn >= ?';
+					$_stmt_array['str_types'] .= 's';
+					$_stmt_array['arr_values'][] = $PARAMETER['dlmrgbeginn'];
+				}
+				//are these tests (above and below) ok (date cp to datetime and format may be wrong...)?
+				if ( isset($PARAMETER['dlmrgend']) AND $PARAMETER['dlmrgend'] != '' ) {
+					$_stmt_array['stmt'] .= ' AND view__opsz_termine__'.$_SESSION['os_role'].'.ende <= ?';
+					$_stmt_array['str_types'] .= 's';
+					$_stmt_array['arr_values'][] = $PARAMETER['dlmrgend'];
+				}
+				$_stmt_array['stmt'] = 'UPDATE view__opsz_dolmetschereinsatz__'.$_SESSION['os_role'].' SET id_opsz_dolmetscherrechnung = '.$PARAMETER['id_opsz_dolmetscherrechnung'].' WHERE id_opsz_dolmetschereinsatz in ('.$_stmt_array['stmt'].')';
+				_execute_stmt($_stmt_array,$conn);
+			}
+			unset($PARAMETER['dlmrgbei']); unset($PARAMETER['dlmrgbeginn']); unset($PARAMETER['dlmrgend']);
+		}
 	}
-	if ( isset($PARAMETER['dlmrgbeginn']) AND $PARAMETER['dlmrgbeginn'] != '' ) {
-		$_stmt_array['stmt'] .= ' AND view__opsz_termine__'.$_SESSION['os_role'].'.beginn >= ?';
-		$_stmt_array['str_types'] .= 'i';
-		$_stmt_array['arr_values'][] = $PARAMETER['dlmrgbeginn'];
-	}
-	//are these tests (above and below) ok (date cp to datetime and format may be wrong...)?
-	if ( isset($PARAMETER['dlmrgend']) AND $PARAMETER['dlmrgend'] != '' ) {
-		$_stmt_array['stmt'] .= ' AND view__opsz_termine__'.$_SESSION['os_role'].'.ende <= ?';
-		$_stmt_array['str_types'] .= 'i';
-		$_stmt_array['arr_values'][] = $PARAMETER['dlmrgend'];
-	}
-	$_stmt['stmt'] = 'UPDATE view__opsz_dolmetschereinsatz__'.$_SESSION['os_role'].' SET id_opsz_dolmetscherrechnung = '.$PARAMETER['id_opsz_dolmetscherrechnung'].' WHERE id_opsz_dolmetschereinsatz in ('.$_stmt_array['stmt'].')';
-	_execute_stmt($_stmt_array,$conn);
 	//get attributed processes
 	unset($_stmt_array); $_stmt_array = array(); unset($_table_result);
-	$_stmt_array['stmt'] = 'SELECT id_opsz_dolmetschereinsatz, UNIX_TIMESTAMP(beginn) AS processunixbegin, UNIX_TIMESTAMP(ende) AS processunixend, dolmibrutto as processbrutto, dolmiordernrextern as processnr from view__opsz_dolmetschereinsatz__'.$_SESSION['os_role'].' LEFT JOIN view__opsz_termine__'.$_SESSION['os_role'].' USING (id_opsz_termine) WHERE view__opsz_dolmetschereinsatz__'.$_SESSION['os_role'].'.id_opsz_dolmetscherrechnung = ? ORDER BY beginn';
+	$_stmt_array['stmt'] = 'SELECT view__opsz_dolmetschereinsatz__'.$_SESSION['os_role'].'.id_opsz_dolmetschereinsatz AS id_opsz_dolmetschereinsatz, UNIX_TIMESTAMP(beginn) AS processunixbegin, UNIX_TIMESTAMP(ende) AS processunixend, bei as processbei, dolmibrutto as processbrutto, dolminetto as processnetto, dolmiordernrextern as processnr from view__opsz_dolmetschereinsatz__'.$_SESSION['os_role'].' LEFT JOIN view__opsz_termine__'.$_SESSION['os_role'].' USING (id_opsz_termine) WHERE view__opsz_dolmetschereinsatz__'.$_SESSION['os_role'].'.id_opsz_dolmetscherrechnung = ? ORDER BY beginn';
 	$_stmt_array['str_types'] = 'i';
 	$_stmt_array['arr_values'] = array($PARAMETER['id_opsz_dolmetscherrechnung']);
 	$_processes_result = execute_stmt($_stmt_array,$conn,true)['result'];
-	if ( ! isset($_processes_result) OR sizeof($_processes_result) == 0 ) { echo("<label><i class=\"fas fa-exclamation-triangle\"></i></label>Zu der gewählten Rechnung gibt es keine Tätigkeiten."); return; }
-	$_report = '';
+	if ( ! isset($_processes_result) OR sizeof($_processes_result) == 0 ) { echo("<label><i class=\"fas fa-exclamation-triangle\"></i></label>Zu der gewählten Rechnung gibt es keine Einsätze."); return; }
+	//now get config
+	$_config = getFunctionConfig('createDolmiInvoice',$conn);
+	//
+	$_totalgross = array();
 	$_totalnet = array();
-	$_totalvat = array();
-	$_totalunits = array();
 	$_earliest = 9999999999;
 	$_latest = 0;
 	$_oldtype = '';
 	$_processtable='';
+	$_totalgrossamount = 0;
 	$_totalnetamount = 0;
-	$_totalvatamount = array();
 	$_currentheight = 100.0;
-	$_reportheight = 10;
 	$_nopages = 1;
 	$_em = array(); $_slashem = array(); $_marked = array();
+	$_bei = array();
 	foreach ( $_processes_result as $index=>$_process ) {
-		$_pos = $index+1;
+		if ( ! isset($_process['processbei']) OR ! isset($_process['processunixbegin']) OR ! isset($_process['processunixend']) OR $_process['processbei'] == '' OR $_process['processunixbegin'] == '' OR $_process['processunixend'] == '' ) {
+			echo("<label><i class=\"fas fa-exclamation-triangle\"></i></label>Bei mindestens einem Termin eines Dolmetschereinsatzes fehlen Angaben."); return; 
+		}
+		$_bei[] = $_process['processbei'];
+		$_bei = array_unique($_bei);
 		$_earliest = min($_earliest,$_process['processunixbegin']);
 		$_latest = max($_latest,$_process['processunixend']);
-		if ( ! isset($_totalnet[$_process['processtype']]) ) { $_totalnet[$_process['processtype']] = 0; };
-		if ( ! isset($_totalvat[$_process['processtype']]) ) { $_totalvat[$_process['processtype']] = array(); };
-		if ( ! isset($_totalvat[$_process['processtype']][$_process['processvatrate']]) ) { $_totalvat[$_process['processtype']][$_process['processvatrate']] = 0; };
-		if ( ! isset($_totalunits[$_process['processtype']]) ) { $_totalunits[$_process['processtype']] = array(); };
-		if ( ! isset($_totalunits[$_process['processtype']][$_process['processunit']]) ) { $_totalunits[$_process['processtype']][$_process['processunit']] = 0; };
 		//collect and sort info
-		if ( (new DateTime())::createFromFormat('U',$_process['processunixbegin'])->format('d.m.Y') == (new DateTime())::createFromFormat('U',$_process['processunixend'])->format('d.m.Y') ) { $_dayend = ''; } else { $_dayend = 'd.m.Y '; };
 		$_em[$index] = ''; $_slashem[$index] = '';
 		if ( $_process['id_opsz_dolmetschereinsatz'] == $PARAM['id_opsz_dolmetschereinsatz'] ) { $_em[$index] = '<span class="marked">'; $_slashem[$index] = '</span>'; };
-		$_reportpart = (new DateTime())::createFromFormat('U',$_process['processunixbegin'])->format('d.m.Y H:i').' - '.(new DateTime())::createFromFormat('U',$_process['processunixend'])->format($_dayend.'H:i').': '.$_process['processdetails'].'<br />';
-		$_noreportlines = round(strlen($_reportpart)/105+0.5);
-		$_reportheight += $_noreportlines*4.6;
-		if ( $_reportheight > 260) { 
-			$_report .= "
-				</div>
-				<div class=\"invoice_page invoicereport\">
-			";
-			$_reportheight = 5+$_nolines*4.6;
-		}		
-		$_report .= $_em[$index].$_reportpart.$_slashem[$index];
-		switch($_process['processunit']) {
-			case 'h':
-				//compute if no value is given
-				if ( $_process['processunits'] == '' ) { $_process['processunits'] = ( $_process['processunixend'] - $_process['processunixbegin'] )/3600; };
-				//no break: the following has to be applied in any case
-			default:
-				$_process['total'] = inCents($_process['processunits'])*$_process['processrate'];
-				$_totalunits[$_process['processtype']][$_process['processunit']] += inCents($_process['processunits']);
-				$_totalnet[$_process['processtype']] += inCents($_process['total']);
-				$_totalvat[$_process['processtype']][$_process['processvatrate']] += (float)$_process['processvatrate']/100*inCents($_process['total']);
-				break;
-		}
-		//count one line per 55 characters in "Tätigkeit"
-		$_nolines = round(strlen($_process['processtype'].': '.$_process['processdetails'])/55+0.5);
-		if ( $PARAMETER['invoicedetailed'] == "ja" ) { $_currentheight += $_nolines*4.6; }
+		$_totalgrossamount += inCents($_process['processbrutto']);
+		$_totalnetamount += inCents($_process['processnetto']);
+		//count one line per process
+		$_nolines = 1;
+		$_currentheight += $_nolines*4.6;
 		//check if we need new page
 		if ( $_currentheight > 260) { 
 			$_nopages += 1;
@@ -819,7 +817,7 @@ function createInvoice(array $PARAM, mysqli $conn)
 					<div class=\"invoicepagenumber\">".$_nopages."</div>	
 					<table>
 						<thead>
-							<tr><th>Pos.</th><th>Tätigkeit</th><th>Datum</th><th>Preis/Einheit</th><th>Einheiten</th><th>Preis</th></tr>
+							<tr><th>Auftragsnummer</th><th>Einsatzdatum und -uhrzeit</th><th>Enstandene Kosten in €</th></tr>
 						</thead>
 			";
 			$_currentheight = 5+$_nolines*4.6;
@@ -827,19 +825,7 @@ function createInvoice(array $PARAM, mysqli $conn)
 		//add to table
 		$_marked[$index] = '';
 		if ( $_process['id_opsz_dolmetschereinsatz'] == $PARAM['id_opsz_dolmetschereinsatz'] ) { $_marked[$index] = 'marked'; };
-		if ( $PARAMETER['invoicedetailed'] == "ja" ) { $_processtable .= '<tr class="'.$_marked[$index].'"><td>'.$_pos.'</td><td class="justify">'.$_process['processtype'].': '.$_process['processdetails'].'</td><td>'.(new DateTime())::createFromFormat('U',$_process['processunixend'])->format('d.m.Y').'</td><td>'.localFormat($_process['processrate']).'</td><td>'.localFormat(inCents($_process['processunits'])).str_replace('1','',$_process['processunit']).'</td><td>'.localFormat(inCents($_process['total'])).'</td></tr>'; }
-		if ( ! isset($_processes_result[$_pos]) OR $_processes_result[$_pos]['processtype'] != $_process['processtype'] ) {
-			$oldtype = $_process['processtype'];
-			//count one line per 55 characters in "Tätigkeit"
-			$_currentheight += 9.2;
-			$_processtable .= '<tr><th>&nbsp;</th><th>'.$oldtype.'</th><th>&nbsp;</th><th>&nbsp;</th><th>'.inTegers($_totalunits[$oldtype]['1']).' | '.localFormat(inCents($_totalunits[$oldtype]['h'])).'h</th><th>'.localFormat(inCents($_totalnet[$oldtype])).'</th></tr><tr><td>&nbsp;</td></tr>';
-		};
-	}
-	foreach ($_totalnet as $_partialnet ) { $_totalnetamount += $_partialnet; }
-	foreach ($_totalvat as $_partialvat ) { 
-		foreach ($_partialvat as $vatrate=>$partialvatrate) {
-			if ( ! isset($_totalvatamount[$vatrate]) ) { $_totalvatamount[$vatrate] = $partialvatrate; } else { $_totalvatamount[$vatrate] += $partialvatrate; }
-		}
+		$_processtable .= '<tr class="'.$_marked[$index].'"><td>'.$_process['processnr'].'</td><td>'.(new DateTime())::createFromFormat('U',$_process['processunixbegin'])->format('d.m.Y H:i').'</td><td>'.localFormat(inCents($_process['processbrutto'])).'</td></tr>';
 	}
 	if ( $_currentheight > 230) { 
 		$_nopages += 1;
@@ -850,83 +836,87 @@ function createInvoice(array $PARAM, mysqli $conn)
 				<div class=\"invoicepagenumber\">".$_nopages."</div>	
 				<table>
 					<thead>
-						<tr><th>Pos.</th><th>Tätigkeit</th><th>Datum</th><th>Preis/Einheit</th><th>Einheiten</th><th>Preis</th></tr>
+						<tr><th>Auftragsnummer</th><th>Einsatzdatum und -uhrzeit</th><th>Enstandene Kosten in €</th></tr>
 					</thead>
 		";
-		if ( $PARAMETER['invoicedetailed'] == "ja" ) { $_currentheight = 5+$_nolines*4.6; } else { $_currentheight = 5; }
+		$_currentheight = 5+$_nolines*4.6;
 	}
-	$_processtable .= '<tr><th>&nbsp;</th><th>&nbsp;</th><th>&nbsp;</th><th>&nbsp;</th><th>Netto</th><th>'.localFormat(inCents($_totalnetamount)).'</th></tr>';
-	$_totalgrossamount = $_totalnetamount;
-	foreach ($_totalvatamount as $vatrate=>$partialvatamount ) {
-		$_processtable .= '<tr><th>&nbsp;</th><th>&nbsp;</th><th>&nbsp;</th><th>&nbsp;</th><th>MwSt '.$vatrate.'%</th><th>'.localFormat(inCents($partialvatamount)).'</th></tr>';
-		$_totalgrossamount += $partialvatamount;
-	}
-	$_processtable .= '<tr><th>&nbsp;</th><th>&nbsp;</th><th>&nbsp;</th><th>&nbsp;</th><th>Gesamt</th><th>'.localFormat(inCents($_totalgrossamount)).'</th></tr>';
+	$_processtable .= '<tr><th>&nbsp;</th><th>Summe</th><th>'.localFormat(inCents($_totalgrossamount)).'</th></tr>';
 	//test if inovice has already been finished and changed
 	$_copy = '';
-	if ( $PARAMETER['invoicefinished'] == "ja" ) {
-		if ( $PARAMETER['invoiceamount'] != (string)inCents($_totalgrossamount) OR $PARAMETER['invoicevat'] != (string)(inCents($_totalgrossamount)-inCents($_totalnetamount)) ) {
-			echo("<label><i class=\"fas fa-exclamation-triangle\"></i></label>Die Rechnung wurde nach Erstellung geändert. Wenn die Änderungen legitim sind, ändern Sie den Status der Rechnung auf unerstellt und erstellen Sie sie erneut."); return; 
+	if ( $PARAMETER['dlmrggenerated'] == "ja" ) {
+		if ( $PARAMETER['dlmrgbrutto'] != (string)inCents($_totalgrossamount) OR $PARAMETER['dlmrgmwst'] != (string)(inCents($_totalgrossamount)-inCents($_totalnetamount)) ) {
+			echo("<label><i class=\"fas fa-exclamation-triangle\"></i></label>Die Rechnung wurde nach Erstellung geändert. Wenn die Änderungen legitim sind, ändere den Status der Rechnung auf unerstellt und erstelle sie erneut."); return; 
 		} else {
 			$_copy = " - Kopie";
 		}
 	} else {
-		$PARAMETER['invoicenumber'] = $PARAMETER['id_opsz_dolmetscherrechnung'].'R'.$invno;
+		//get number of invoices of this bearbeiterinnr and this year
+		unset($_stmt_array); $_stmt_array = array(); 
+		$_stmt_array['stmt'] = "SELECT COUNT(id_opsz_dolmetscherrechnung) AS rgnr FROM view__opsz_dolmetscherrechnung__".$_SESSION['os_role']." WHERE dlmrgstaffnr = ? AND YEAR(dlmrgdatum) = ? AND id_opsz_dolmetscherrechnung <= ?";
+		$_stmt_array['str_types'] = 'isi';
+		$_stmt_array['arr_values'] = array($PARAMETER['dlmrgstaffnr']);
+		$_stmt_array['arr_values'][] = (new DateTime($PARAMETER['dlmrgdatum']))->format('Y');
+		$_stmt_array['arr_values'][] = $PARAMETER['id_opsz_dolmetscherrechnung'];
+		$_rgnr = execute_stmt($_stmt_array,$conn)['result']['rgnr'][0];
+		$PARAMETER['dlmrgnr'] = (new DateTime($PARAMETER['dlmrgdatum']))->format('Y').'/'.$PARAMETER['dlmrgstaffnr'].'/'.$_rgnr;
 		unset($_stmt_array); $_stmt_array = array(); unset($_table_result);
-		$_stmt_array['stmt'] = "UPDATE view__opsz_dolmetscherrechnung__".$_SESSION['os_role']." SET invoicefinished='ja', invoicenumber=?, invoiceamount=?, invoicevat=? WHERE id_opsz_dolmetscherrechnung = ?";
-		$_stmt_array['str_types'] = 'sssi';
+		$_stmt_array['stmt'] = "UPDATE view__opsz_dolmetscherrechnung__".$_SESSION['os_role']." SET dlmrggenerated='ja', dlmrgnr=?, dlmrgbrutto=?, dlmrgnetto=?, dlmrgmwst=? WHERE id_opsz_dolmetscherrechnung = ?";
+		$_stmt_array['str_types'] = 'ssssi';
 		$_stmt_array['arr_values'] = array();
-		$_stmt_array['arr_values'][] = (string)$PARAMETER['invoicenumber'];
+		$_stmt_array['arr_values'][] = (string)$PARAMETER['dlmrgnr'];
 		$_stmt_array['arr_values'][] = (string)inCents($_totalgrossamount);
+		$_stmt_array['arr_values'][] = (string)inCents($_totalnetamount);
 		$_stmt_array['arr_values'][] = (string)(inCents($_totalgrossamount)-inCents($_totalnetamount));
 		$_stmt_array['arr_values'][] = $PARAMETER['id_opsz_dolmetscherrechnung'];
 		_execute_stmt($_stmt_array,$conn);
 	}
 	//get (first) active id
 	unset($_stmt_array); $_stmt_array = array(); unset($_table_result);
-	$_stmt_array['stmt'] = "SELECT * from view__ocrm_identity__".$_SESSION['os_role']." WHERE idactive = 'ja';";
-	$_myid = execute_stmt($_stmt_array,$conn,true)['result'][0];	
+	$_myid = $_config['id'];	
 	?>
-	<link rel="stylesheet" type="text/css" href="/css/ocrm_invoice.css">
+	<link rel="stylesheet" type="text/css" href="/css/opsz_invoice.css">
 	<?php includeFunctions('DETAILS',$conn); ?>	
 	<form class="db_options function" method="POST" action="" onsubmit="callFunction(this,'dbAction','message'); return false;">
 		<input type="text" hidden value="<?php html_echo($PARAMETER['id_opsz_dolmetscherrechnung']); ?>" name="id_opsz_dolmetscherrechnung" class="inputid" />
+		<input type="text" hidden value="::PORTRAIT" name="_scope_"/>
 	</form>
 	<div class="invoice_wrapper">
 		<div class="invoiceheader">
 			<div class="invoicecc"></div>
 			<div class="invoiceaddress">
-				<div class="myidentity"><?php echo($_myid['idname'].' | '.$_myid['idstreet'].' | '.$_myid['idpostcode'].' '.$_myid['idcity']); ?></div>
-				<div class="invoicename"><?php html_echo($_customer_result['name']); ?></div>
-				<div class="invoicecontact"><?php html_echo($_customer_result['contact']); ?></div>
-				<div class="invoicestreet"><?php html_echo($_customer_result['street']); ?></div>
-				<div class="invoicecity"><?php html_echo($_customer_result['postcode'].' '.$_customer_result['city']); ?></div>
+				<div class="myidentity"><?php html_echo($_config['id']); ?></div>
+				<div class="invoicerecipient"><?php echo(preg_replace('/\r*\n/','<br />',$PARAMETER['dlmrgaddr'])); ?></div>
 			</div>
 			<div class="invoicedata">
 				<table>
-				<tr><td>Rechnungsnummer</td><td><?php echo($PARAMETER['invoicenumber']); ?></td></tr>
-				<tr><td>Auftragssnummer</td><td><?php echo($PARAMETER['id_ocrm_proposals']); ?></td></tr>
-				<tr><td>Datum</td><td><?php echo((new DateTime($PARAMETER['invoicedate']))->format('d.m.Y')); ?></td></tr>
-				<tr><td>Kundennummer</td><td><?php echo($_customer_result['code']); ?></td></tr>
-				<tr><td>Leistungs-/Lieferdatum</td><td><?php echo((new DateTime())::createFromFormat('U',$_earliest)->format('d.m.Y').' - '.(new DateTime())::createFromFormat('U',$_latest)->format('d.m.Y')); ?></td></tr>
+				<tr><td>Rechnungsnummer</td><td><?php echo($PARAMETER['dlmrgnr']); ?></td></tr>
+				<tr><td>Datum</td><td><?php echo((new DateTime($PARAMETER['dlmrgdatum']))->format('d.m.Y')); ?></td></tr>
 				<tr><td>Seite</td><td>1/<?php echo($_nopages); ?></td></tr>
 				</table>
 			</div>
 		</div> <!-- end of invoiceheader -->
-		<h2>Rechnung<?php echo($_copy); ?></h2>
+		<h2>Rechnung<?php echo($_copy.' '.$PARAMETER['dlmrgnr']); ?></h2>
+		<h2>Dolmetscherkosten für <?php html_echo(str_replace('vermittlung','',$PARAMETER['dlmrgtype'])); ?>-Termine bei <?php html_echo(implode(', ',$_bei)); ?></h2>
+		<h4><?php html_echo($PARAMETER['dlmrgname'].', '.$PARAMETER['dlmrgvorname'].', geb. '.(new DateTime($PARAMETER['dlmrggeb']))->format('d.m.Y')); ?></h4>
+		<h4><?php html_echo($PARAMETER['dlmrgclientextern']); ?></h4>
+		<p><?php echo(preg_replace('/\r*\n/','<br />',$_config['pretext'])); ?></p>
 		<table>
 			<thead>
-				<tr><th>Pos.</th><th>Tätigkeit</th><th>Datum</th><th>Preis/Einheit</th><th>Einheiten</th><th>Preis</th></tr>
+				<tr><th>Auftragsnummer</th><th>Einsatzdatum und -uhrzeit</th><th>Enstandene Kosten in €</th></tr>
 			</thead>
 			<?php echo($_processtable); ?>
 		</table>
-		<div>Bitte überweisen Sie den Rechnungsbetrag von <strong><?php echo(localFormat(inCents($_totalgrossamount))); ?> €</strong> bis <strong><?php echo((new DateTime($PARAMETER['invoicedate']))->modify('+'.$PARAMETER['invoicetarget'].' days')->format('d.m.Y')); ?></strong> unter Angabe der Rechnungsnummer.</div>
-		<div><?php echo($PARAMETER['invoicemessage']); ?></div>
+		<div><?php html_echo($PARAMETER['dlmrgtext']); ?></div>
+		<div>Bitte überweisen Sie den Rechnungsbetrag von <strong><?php echo(localFormat(inCents($_totalgrossamount))); ?> €</strong> auf unser Konto
+			<p>
+			IBAN <?php html_echo($_config['bank']['iban']); ?><br />
+			BIC <?php html_echo($_config['bank']['bic']); ?><br />
+			<?php html_echo($_config['bank']['name']); ?><br />
+			</p>
+			 Als Verwendungszweck geben Sie bitte <strong><?php html_echo($PARAMETER['dlmrgnr']); ?></strong> an.
+		</div>
 	</div> <!-- end of invoice_wrapper -->
-	<div class="invoice_page invoicereport">
-		<h3>Arbeitsbericht</h3>
-	<?php echo($_report); ?>
-	</div>
 <?php }
 
 ?>
