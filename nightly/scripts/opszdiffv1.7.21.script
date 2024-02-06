@@ -1,0 +1,11 @@
+# DO NOT SUBMIT EMPTY FIELDS! SORRY!
+#
+# Dolmetschereinsatz ergänzen
+# field Bemerkungen in opsz_dolmetscherinsatz was massing last time
+?table=opsz_dolmetschereinsatz_permissions&keymachine=dolmibemerkung&keyreadable=Bemerkungen&realid=4.5&typelist=TEXT&edittype=FREE&referencetag=_dolmibemerkung&role_0=0&dbAction=insert
+?table=opsz_dolmetschereinsatz_permissions&keymachine=dolmibeginn&keyreadable=Datum%20und%20Uhrzeit&realid=3.6&typelist=DATETIME&edittype=DATETIME&role_0=0&dbAction=insert
+?table=opsz_dolmetschereinsatz_permissions&keymachine=dolmibei&keyreadable=bei&realid=3.7&typelist=VARCHAR(80)&edittype=TEXT&role_0=0&dbAction=insert
+?table=opsz_dolmetschereinsatz_permissions&keymachine=dolmidolmetscher&keyreadable=Dolmetscher&realid=3.8&typelist=VARCHAR(80)&edittype=TEXT&role_0=0&dbAction=insert
+#
+# Dolmetscherrechnung ergänzen
+?table=opsz_dolmetscherrechnung_permissions&keymachine=dlmrghash&keyreadable=_none_&realid=99&typelist=VARCHAR(80)&edittype=NONE&role_0=0&dbAction=insert
