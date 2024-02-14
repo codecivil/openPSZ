@@ -725,6 +725,8 @@ function createDolmiInvoice(array $PARAM, mysqli $conn)
 	$PARAMETER = execute_stmt($_stmt_array,$conn,true)['result'][0];
 	$DLMRGPARAM = array_filter($PARAMETER,function($_key){ return strpos($_key,'dlmrg') === 0; },ARRAY_FILTER_USE_KEY); //array of proper dlmrg*-parameters
 	unset($DLMRGPARAM['dlmrggenerated']); unset($DLMRGPARAM['dlmrghash']); unset($DLMRGPARAM['dlmrgbemerkung']); //these fields can change without need of regenerating the invoice
+	unset($DLMRGPARAM['dlmrgbrutto']); unset($DLMRGPARAM['dlmrgnetto']); unset($DLMRGPARAM['dlmrgmwst']); //these fields might change when creating the invoice and are updated only after generating the hash...
+                //and, btw, the processtable contains the complete info about this.
 	//$PARAMETER is invoice parameters
 	//header
 	//get attributed client
@@ -746,25 +748,25 @@ function createDolmiInvoice(array $PARAM, mysqli $conn)
 				$PARAMETER['dlmrgbeginn'] = $_filter[1][$_filterindex];
 				$PARAMETER['dlmrgend'] = $_filter[2][$_filterindex];
 				unset($_stmt_array); $_stmt_array = array(); unset($_table_result);
-				$_stmt_array['stmt'] = 'SELECT view__opsz_dolmetschereinsatz__'.$_SESSION['os_role'].'.id_opsz_dolmetschereinsatz from view__opsz_dolmetschereinsatz__'.$_SESSION['os_role'].' LEFT JOIN view__opsz_termine__'.$_SESSION['os_role'].' USING (id_opsz_termine) WHERE view__opsz_dolmetschereinsatz__'.$_SESSION['os_role'].'.id_opsz_dolmetscherrechnung IS NULL AND view__opsz_termine__'.$_SESSION['os_role'].'.id_opsz_vermittlungslisten = ?'; //collect all matching a certain vermittlungsliste!
+				$_stmt_array['stmt'] = 'SELECT view__opsz_dolmetschereinsatz__'.$_SESSION['os_role'].'.id_opsz_dolmetschereinsatz from view__opsz_dolmetschereinsatz__'.$_SESSION['os_role'].' LEFT JOIN view__opsz_termine__'.$_SESSION['os_role'].' USING (id_opsz_termine) WHERE ( view__opsz_dolmetschereinsatz__'.$_SESSION['os_role'].'.id_opsz_dolmetscherrechnung IS NULL OR view__opsz_dolmetschereinsatz__'.$_SESSION['os_role'].'.id_opsz_dolmetscherrechnung = 0 ) AND view__opsz_termine__'.$_SESSION['os_role'].'.id_opsz_vermittlungslisten = ?'; //collect all matching a certain vermittlungsliste!
 				$_stmt_array['str_types'] = 'i';
 				$_stmt_array['arr_values'] = array($PARAMETER['id_opsz_vermittlungslisten']);
 				if ( isset($PARAMETER['dlmrgbei']) AND $PARAMETER['dlmrgbei'] != '' ) {
-					$_stmt_array['stmt'] .= ' AND ( view__opsz_dolmetschereinsatz__'.$_SESSION['os_role'].'.dolmibei = ? OR ( view__opsz_dolmetschereinsatz__'.$_SESSION['os_role'].'.dolmibei IS NULL AND view__opsz_termine__'.$_SESSION['os_role'].'.bei = ? ) )';
-					$_stmt_array['str_types'] .= 's';
+					$_stmt_array['stmt'] .= ' AND ( view__opsz_dolmetschereinsatz__'.$_SESSION['os_role'].'.dolmibei = ? OR ( ( view__opsz_dolmetschereinsatz__'.$_SESSION['os_role'].'.dolmibei IS NULL OR view__opsz_dolmetschereinsatz__'.$_SESSION['os_role'].'.dolmibei = 0 ) AND view__opsz_termine__'.$_SESSION['os_role'].'.bei = ? ) )';
+					$_stmt_array['str_types'] .= 'ss';
 					$_stmt_array['arr_values'][] = $PARAMETER['dlmrgbei'];
 					$_stmt_array['arr_values'][] = $PARAMETER['dlmrgbei'];
 				}
 				if ( isset($PARAMETER['dlmrgbeginn']) AND $PARAMETER['dlmrgbeginn'] != '' ) {
-					$_stmt_array['stmt'] .= ' AND ( view__opsz_dolmetschereinsatz__'.$_SESSION['os_role'].'.dolmibeginn >= ? OR ( view__opsz_dolmetschereinsatz__'.$_SESSION['os_role'].'.dolmibeginn IS NULL AND view__opsz_termine__'.$_SESSION['os_role'].'.beginn >= ? ) )';
-					$_stmt_array['str_types'] .= 's';
+					$_stmt_array['stmt'] .= ' AND ( view__opsz_dolmetschereinsatz__'.$_SESSION['os_role'].'.dolmibeginn >= ? OR ( ( view__opsz_dolmetschereinsatz__'.$_SESSION['os_role'].'.dolmibeginn IS NULL OR view__opsz_dolmetschereinsatz__'.$_SESSION['os_role'].'.dolmibeginn = 0 ) AND view__opsz_termine__'.$_SESSION['os_role'].'.beginn >= ? ) )';
+					$_stmt_array['str_types'] .= 'ss';
 					$_stmt_array['arr_values'][] = $PARAMETER['dlmrgbeginn'];
 					$_stmt_array['arr_values'][] = $PARAMETER['dlmrgbeginn'];
 				}
 				//are these tests (above and below) ok (date cp to datetime and format may be wrong...)?
 				if ( isset($PARAMETER['dlmrgend']) AND $PARAMETER['dlmrgend'] != '' ) {
 					$_stmt_array['stmt'] .= ' AND ( view__opsz_dolmetschereinsatz__'.$_SESSION['os_role'].'.dolmibeginn <= ? OR ( view__opsz_dolmetschereinsatz__'.$_SESSION['os_role'].'.dolmibeginn IS NULL AND view__opsz_termine__'.$_SESSION['os_role'].'.beginn <= ? ) )';
-					$_stmt_array['str_types'] .= 's';
+					$_stmt_array['str_types'] .= 'ss';
 					$_stmt_array['arr_values'][] = $PARAMETER['dlmrgend'];
 					$_stmt_array['arr_values'][] = $PARAMETER['dlmrgend'];
 				}
@@ -873,7 +875,7 @@ function createDolmiInvoice(array $PARAM, mysqli $conn)
 	if ( $PARAMETER['dlmrggenerated'] == "ja" ) {
 //		if ( $PARAMETER['dlmrgbrutto'] != (string)inCents($_totalgrossamount) OR $PARAMETER['dlmrgmwst'] != (string)(inCents($_totalgrossamount)-inCents($_totalnetamount)) ) {
 		if ( $PARAMETER['dlmrghash'] != hash('sha256', $_processtable.json_encode($DLMRGPARAM)) ) {
-			echo("<label><i class=\"fas fa-exclamation-triangle\"></i></label>Die Rechnung wurde nach Erstellung geändert. Wenn die Änderungen legitim sind, ändere den Status der Rechnung auf unerstellt und erstelle sie erneut."); return; 
+			echo("<br /><label><i class=\"fas fa-exclamation-triangle\"></i></label> Die Rechnung wurde nach Erstellung geändert. Wenn die Änderungen legitim sind, ändere den Status der Rechnung auf unerstellt und erstelle sie erneut.<br />"); return; 
 		} else {
 			$_copy = " - Kopie";
 		}
