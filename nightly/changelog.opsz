@@ -1,9 +1,8 @@
-v1.7.25
+v1.8.0
 ======
-26.03.2024
+29.03.2024
 
-* Callbackfunktionen definiert und trafficLight-Konfiguration erweitert, um automatich U18 und Ü60 zu setzen oder zu
-  löschen
+* Altersfeld als virtuelles Feld im Aufnahmebogen
 
 v1.7.24
 ======
