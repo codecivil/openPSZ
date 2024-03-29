@@ -949,4 +949,61 @@ function createDolmiInvoice(array $PARAM, mysqli $conn)
 	</div> <!-- end of invoice_wrapper -->
 <?php }
 
+//
+//UNREGISTERED CALLBACK FUNCTIONS FOR trafficLight
+//
+// _callback_<functionname>(string $table, array $idlist, mysqli $conn)
+//
+
+function _callback_markOver60 (string $table, array $idlist, mysqli $conn) {
+    
+    if ( $table != "opsz_aufnahme" ) { return; }
+    
+    //add where vulnerabilitaet is not NULL
+    unset($_stmt_array); $_stmt_array = array(); 
+    $_stmt_array['stmt'] = "UPDATE opsz_aufnahme SET vulnerabilitaet = REPLACE(CONCAT('[\"Ü 60\",',REPLACE(vulnerabilitaet,'[','')),',]',']') where id_opsz_aufnahme in (".implode(',',$idlist).")";
+    _execute_stmt($_stmt_array);
+    //add where vulnerabilitaet is NULL
+    unset($_stmt_array); $_stmt_array = array(); 
+    $_stmt_array['stmt'] = "UPDATE opsz_aufnahme SET vulnerabilitaet = '[\"Ü 60\"]' WHERE id_opsz_aufnahme in (".implode(',',$idlist).") AND vulnerabilitaet IS NULL";
+    _execute_stmt($_stmt_array);    
+
+}
+
+function _callback_markUnder18 (string $table, array $idlist, mysqli $conn) {
+    
+    if ( $table != "opsz_aufnahme" ) { return; }
+    
+    //add where vulnerabilitaet is not NULL
+    unset($_stmt_array); $_stmt_array = array(); 
+    $_stmt_array['stmt'] = "UPDATE opsz_aufnahme SET vulnerabilitaet = REPLACE(CONCAT('[\"U 18\",',REPLACE(vulnerabilitaet,'[','')),',]',']') where id_opsz_aufnahme in (".implode(',',$idlist).")";
+    _execute_stmt($_stmt_array);
+    //add where vulnerabilitaet is NULL
+    unset($_stmt_array); $_stmt_array = array(); 
+    $_stmt_array['stmt'] = "UPDATE opsz_aufnahme SET vulnerabilitaet = '[\"U 18\"]' WHERE id_opsz_aufnahme in (".implode(',',$idlist).") AND vulnerabilitaet IS NULL";
+    _execute_stmt($_stmt_array);    
+
+}
+
+function _callback_unmarkUnder18 (string $table, array $idlist, mysqli $conn) {
+    
+    if ( $table != "opsz_aufnahme" ) { return; }
+    
+    unset($_stmt_array); $_stmt_array = array(); 
+    $_stmt_array['stmt'] = "UPDATE opsz_aufnahme SET vulnerabilitaet = REPLACE(REPLACE(REPLACE(REPLACE(vulnerabilitaet,'\"U 18\"',''),',,',','),'[,','['),',]',']') where id_opsz_aufnahme in (".implode(',',$idlist).")";
+    _execute_stmt($_stmt_array);
+
+}
+
+//unmarkOver60 may happen when birth date was false and is corrected later
+function _callback_unmarkOver60 (string $table, array $idlist, mysqli $conn) {
+    
+    if ( $table != "opsz_aufnahme" ) { return; }
+    
+    unset($_stmt_array); $_stmt_array = array(); 
+    $_stmt_array['stmt'] = "UPDATE opsz_aufnahme SET vulnerabilitaet = REPLACE(REPLACE(REPLACE(REPLACE(vulnerabilitaet,'\"Ü 60\"',''),',,',','),'[,','['),',]',']') where id_opsz_aufnahme in (".implode(',',$idlist).")";
+    _execute_stmt($_stmt_array);
+
+}
+
 ?>
