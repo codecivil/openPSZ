@@ -1,0 +1,8 @@
+#
+# Untertabellen von opsz_aufnahme
+# adapt permuissions to the ones used for opsz_aufnahme
+#
+?table=os_tables&iconname=person-through-window&tablemachine=stammdaten&tablereadable=Stammdaten&allowed_roles=%5B0%5D&delete_roles=%5B0%5D&parentmachine=opsz_aufnahme&dbAction=insert
+?table=os_tables&iconname=layer-group&tablemachine=klassifikation&tablereadable=Klassifikation&allowed_roles=%5B0%5D&delete_roles=%5B0%5D&parentmachine=opsz_aufnahme&dbAction=insert
+?table=os_tables&iconname=notes-medical&tablemachine=gesundheit&tablereadable=Gesundheit&allowed_roles=%5B0%5D&delete_roles=%5B0%5D&parentmachine=opsz_aufnahme&dbAction=insert
+?table=os_tables&iconname=circle-nodes&tablemachine=aufenthalt&tablereadable=Aufenthalt%20in%20Deutschland&allowed_roles=%5B0%5D&delete_roles=%5B0%5D&parentmachine=opsz_aufnahme&dbAction=insert

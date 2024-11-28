@@ -1,19 +1,19 @@
 -- add fields in opsz_aufnahme
 -- beratungsangaben
 ALTER TABLE `opsz_aufnahme` ADD COLUMN IF NOT EXISTS `beratungsangaben` TEXT DEFAULT NULL;
-INSERT  INTO `opsz_aufnahme_permissions` (`keymachine`,`keyreadable`,`realid`,`typelist`,`edittype`,`referencetag`,`role_0`) VALUES ('beratungsangaben','Angaben zu Beratungsstellen','31.100','TEXT','LIST + FREE; MULTIPLE','_beratungstyp','0');
+INSERT  INTO `opsz_aufnahme_permissions` (`keymachine`,`keyreadable`,`realid`,`typelist`,`edittype`,`referencetag`,`role_0`) SELECT 'beratungsangaben','Angaben zu Beratungsstellen','31.100','TEXT','LIST + FREE; MULTIPLE','_beratungstyp','0' FROM DUAL WHERE (SELECT count(*) FROM information_schema.COLUMNS WHERE TABLE_NAME = 'opsz_aufnahme' AND COLUMN_NAME = 'beratungsangaben') > 0 AND (SELECT count(keymachine) FROM `opsz_aufnahme_permissions` where keymachine = 'beratungsangaben') = 0;
 INSERT  INTO `opsz_aufnahme_references` (`referencetag`,`allowed_values`) VALUES ('_beratungstyp','["*Andere Beratungsstellen","Migrationsberatung","Rechtsanwält*in","Unterstützer*in","Familienhilfe"]');
 -- mobilität
-UPDATE `opsz_aufnahme_permissions`SET `keyreadable`= 'Mobilität - veraltet (bitte neues Feld benutzen)' WHERE `keymachine`= 'mobilität';
+UPDATE `opsz_aufnahme_permissions`SET `keyreadable`= 'Mobilität - veraltet (bitte neues Feld benutzen)', `role_0`=6 WHERE `keymachine`= 'mobilität';
 ALTER TABLE `opsz_aufnahme` ADD COLUMN IF NOT EXISTS `mobilitätneu` TEXT DEFAULT NULL;
 -- -- edittype MULTIPLE is not set here: make updateSelections work with that!
-INSERT  INTO `opsz_aufnahme_permissions` (`keymachine`,`keyreadable`,`realid`,`typelist`,`edittype`,`referencetag`,`role_0`) VALUES ('mobilitätneu','Mobilität',25.100,'TEXT','CHECKBOX','_mobilitaet','0');
+INSERT  INTO `opsz_aufnahme_permissions` (`keymachine`,`keyreadable`,`realid`,`typelist`,`edittype`,`referencetag`,`role_0`) SELECT 'mobilitätneu','Mobilität',25.100,'TEXT','CHECKBOX','_mobilitaet','0' FROM DUAL WHERE (SELECT count(*) FROM information_schema.COLUMNS WHERE TABLE_NAME = 'opsz_aufnahme' AND COLUMN_NAME = 'mobilitätneu') > 0 AND (SELECT count(keymachine) FROM `opsz_aufnahme_permissions` where keymachine = 'mobilitätneu') = 0;
 INSERT  INTO `opsz_aufnahme_references` (`referencetag`,`allowed_values`) VALUES ('_mobilitaet','["ÖPNV","Auto","Fahrrad","zu Fuß"]');
 ALTER TABLE `opsz_aufnahme` ADD COLUMN IF NOT EXISTS `videogespraeche` VARCHAR(10) DEFAULT NULL;
-INSERT  INTO `opsz_aufnahme_permissions` (`keymachine`,`keyreadable`,`realid`,`typelist`,`edittype`,`referencetag`,`role_0`) VALUES ('videogespraeche','Videogespräche erwünscht','25.2','VARCHAR(10)','LIST','_binary','0');
+INSERT  INTO `opsz_aufnahme_permissions` (`keymachine`,`keyreadable`,`realid`,`typelist`,`edittype`,`referencetag`,`role_0`) SELECT 'videogespraeche','Videogespräche erwünscht','25.2','VARCHAR(10)','LIST','_binary','0' FROM DUAL WHERE (SELECT count(*) FROM information_schema.COLUMNS WHERE TABLE_NAME = 'opsz_aufnahme' AND COLUMN_NAME = 'videogespraeche') > 0 AND (SELECT count(keymachine) FROM `opsz_aufnahme_permissions` where keymachine = 'videogespraeche') = 0;
 -- messenger
 ALTER TABLE `opsz_aufnahme` ADD COLUMN IF NOT EXISTS `messenger` TEXT DEFAULT NULL;
-INSERT  INTO `opsz_aufnahme_permissions` (`keymachine`,`keyreadable`,`realid`,`typelist`,`edittype`,`referencetag`,`role_0`) VALUES ('messenger','Messenger-Erstkontakt erwünscht: _ + unterschrieben + Messenger + Telefonnummer (falls abweichend)',14.5,'TEXT','LIST + LIST + LIST + PHONE; MULTIPLE','_binary + _messenger_binary + _messengers + _messenger_phone','0');
+INSERT  INTO `opsz_aufnahme_permissions` (`keymachine`,`keyreadable`,`realid`,`typelist`,`edittype`,`referencetag`,`role_0`) SELECT 'messenger','Messenger-Erstkontakt erwünscht: _ + unterschrieben + Messenger + Telefonnummer (falls abweichend)',14.5,'TEXT','LIST + LIST + LIST + PHONE; MULTIPLE','_binary + _messenger_binary + _messengers + _messenger_phone','0' FROM DUAL WHERE (SELECT count(*) FROM information_schema.COLUMNS WHERE TABLE_NAME = 'opsz_aufnahme' AND COLUMN_NAME = 'messenger') > 0 AND (SELECT count(keymachine) FROM `opsz_aufnahme_permissions` where keymachine = 'messenger') = 0;
 INSERT  INTO `opsz_aufnahme_references` (`referencetag`,`allowed_values`) VALUES ('_messenger_binary','["_HIDE_"]');
 INSERT  INTO `opsz_aufnahme_references` (`referencetag`,`depends_on_key`,`depends_on_value`,`allowed_values`) VALUES ('_messenger_binary','messenger[0];local','ja','["*zu klären","ja","nein","_SHOW_"]');
 INSERT  INTO `opsz_aufnahme_references` (`referencetag`,`allowed_values`) VALUES ('_messengers','["_HIDE_"]');
@@ -22,13 +22,13 @@ INSERT  INTO `opsz_aufnahme_references` (`referencetag`,`allowed_values`) VALUES
 INSERT  INTO `opsz_aufnahme_references` (`referencetag`,`depends_on_key`,`depends_on_value`,`allowed_values`) VALUES ('_messenger_phone','messenger[0];local','ja','["_SHOW_"]');
 -- arztangeban
 ALTER TABLE `opsz_aufnahme` ADD COLUMN IF NOT EXISTS `arztangaben` TEXT DEFAULT NULL;
-INSERT  INTO `opsz_aufnahme_permissions` (`keymachine`,`keyreadable`,`realid`,`typelist`,`edittype`,`referencetag`,`role_0`) VALUES ('arztangaben','Angaben zu Ärzt*innen: Kategorie + Kontakt','19.1','TEXT','LIST + FREE; MULTIPLE','_arzttyp + _arztkontakt','0');
+INSERT  INTO `opsz_aufnahme_permissions` (`keymachine`,`keyreadable`,`realid`,`typelist`,`edittype`,`referencetag`,`role_0`) SELECT 'arztangaben','Angaben zu Ärzt*innen: Kategorie + Kontakt','19.1','TEXT','LIST + FREE; MULTIPLE','_arzttyp + _arztkontakt','0' FROM DUAL WHERE (SELECT count(*) FROM information_schema.COLUMNS WHERE TABLE_NAME = 'opsz_aufnahme' AND COLUMN_NAME = 'arztangaben') > 0 AND (SELECT count(keymachine) FROM `opsz_aufnahme_permissions` where keymachine = 'arztangaben') = 0;
 INSERT  INTO `opsz_aufnahme_references` (`referencetag`,`allowed_values`) VALUES ('_arzttyp','["*keine Angaben","Hausärzt*in","Psychiater*in","Neurolog*in","Frauenärzt*in","~andere Ärzt*innen"]');
 INSERT  INTO `opsz_aufnahme_references` (`referencetag`,`allowed_values`) VALUES ('_arztkontakt','["_SHOW_"]');
 INSERT  INTO `opsz_aufnahme_references` (`referencetag`,`depends_on_key`,`depends_on_value`,`allowed_values`) VALUES ('_arztkontakt','arztangaben[0];local','*keine Angaben','["_HIDE_"]');
 -- behinderung
 ALTER TABLE `opsz_aufnahme` ADD COLUMN IF NOT EXISTS `behinderung` VARCHAR(10) DEFAULT NULL;
-INSERT  INTO `opsz_aufnahme_permissions` (`keymachine`,`keyreadable`,`realid`,`typelist`,`edittype`,`referencetag`,`role_0`) VALUES ('behinderung','Liegt eine Behinderung vor?',26.5,'VARCHAR(10)','LIST','_binary','0');
+INSERT  INTO `opsz_aufnahme_permissions` (`keymachine`,`keyreadable`,`realid`,`typelist`,`edittype`,`referencetag`,`role_0`) SELECT 'behinderung','Liegt eine Behinderung vor?',26.5,'VARCHAR(10)','LIST','_binary','0' FROM DUAL WHERE (SELECT count(*) FROM information_schema.COLUMNS WHERE TABLE_NAME = 'opsz_aufnahme' AND COLUMN_NAME = 'behinderung') > 0 AND (SELECT count(keymachine) FROM `opsz_aufnahme_permissions` where keymachine = 'behinderung') = 0;
 -- update lebensunterhalt
 UPDATE `opsz_aufnahme_references` SET `allowed_values` = '["*zu klären","Sozialamt","Jobcenter","Arbeit","~Sonstiges"]' WHERE `referencetag` = '_lebensunterhalt';
 -- update Angaben zu Kindern -> Angaben zu Familienangehörigen
