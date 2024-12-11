@@ -1,8 +1,13 @@
+v1.8.11
+======
+
+* Fehlende Felder in v1.8.10.sql ergänzt
+
 v1.8.10
 ======
 
 * v1.8.9.sql: Aufnahmebogen angepasst
-* v1.8.10.sql: Aufnahmebogen in Untertabellen unterteilt
+* v1.8.10.script/v1.8.10.sql: Aufnahmebogen in Untertabellen unterteilt
 
 v1.8.0
 ======
