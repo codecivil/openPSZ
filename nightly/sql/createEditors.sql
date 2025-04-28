@@ -1,0 +1,3 @@
+-- Lege Editoren
+CREATE USER editor1 IDENTIFIED BY 'passwd';
+GRANT ALL PRIVILEGES ON opsz.* TO editor1 WITH GRANT OPTION;
