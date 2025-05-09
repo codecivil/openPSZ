@@ -1,3 +1,12 @@
+v1.15.0-1.0
+======
+
+* "erstelle Terminbrief" und "erstelle Ersttermin" als Funktionen
+  iḿ Feld "vermittelt zu" in Vermittlungslisten
+  
+* SQL-Update ersetzt das von 1.14.0-1.0/1, kann aber auch wie immer danach
+  importiert werden
+
 v1.14.0-1.1
 ======
 
